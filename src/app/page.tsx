@@ -35,6 +35,7 @@ export default function NepaliWordMasterPage() {
   const [assessmentDone, setAssessmentDone] = useState<boolean>(true); 
   const [isLoadingWord, setIsLoadingWord] = useState<boolean>(false);
   const [sessionStarted, setSessionStarted] = useState(false);
+  const [earlyAssessmentMade, setEarlyAssessmentMade] = useState<boolean>(false);
 
   const { toast } = useToast();
   const { sessionData, updateSessionData, clearSessionData } = useSessionPersistence();
@@ -44,6 +45,7 @@ export default function NepaliWordMasterPage() {
     setIsLoadingWord(true);
     setMeaningsVisible(false);
     setAssessmentDone(false);
+    setEarlyAssessmentMade(false);
   
     const nextWord = getNextWord();
   
@@ -90,7 +92,22 @@ export default function NepaliWordMasterPage() {
     selectNextWord();
   };
 
-  const handleAssessment = (knewIt: boolean) => {
+  const handleEarlyAssessment = (knewIt: boolean) => {
+    if (!currentWord) return;
+    
+    setEarlyAssessmentMade(true);
+    setIsTimerRunning(false);
+    setMeaningsVisible(true);
+    
+    // If they knew it early, we can skip to next word after showing meaning briefly
+    if (knewIt) {
+      setTimeout(() => {
+        handleFinalAssessment(true);
+      }, 2000); // Show meaning for 2 seconds then proceed
+    }
+  };
+
+  const handleFinalAssessment = (knewIt: boolean) => {
     if (!currentWord) return;
 
     setAssessmentDone(true);
@@ -100,7 +117,10 @@ export default function NepaliWordMasterPage() {
       totalUnknown: (sessionData?.totalUnknown || 0) + (knewIt ? 0 : 1)
     });
     
-    selectNextWord();
+    // Auto-proceed to next word after a short delay
+    setTimeout(() => {
+      selectNextWord();
+    }, 1000);
   };
 
   const handleTimerDurationChange = (duration: number) => {
@@ -118,18 +138,29 @@ export default function NepaliWordMasterPage() {
   // Keyboard navigation
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
-      if (meaningsVisible && !assessmentDone) {
-        if (e.key === 'y' || e.key === 'Y') handleAssessment(true);
-        if (e.key === 'n' || e.key === 'N') handleAssessment(false);
+      if (e.key === 'y' || e.key === 'Y') {
+        if (!meaningsVisible && !earlyAssessmentMade) {
+          handleEarlyAssessment(true);
+        } else if (meaningsVisible && !assessmentDone) {
+          handleFinalAssessment(true);
+        }
       }
-      if (e.key === ' ' && !isTimerRunning && !meaningsVisible) {
+      if (e.key === 'n' || e.key === 'N') {
+        if (!meaningsVisible && !earlyAssessmentMade) {
+          handleEarlyAssessment(false);
+        } else if (meaningsVisible && !assessmentDone) {
+          handleFinalAssessment(false);
+        }
+      }
+      if (e.key === ' ' && !isTimerRunning && !meaningsVisible && assessmentDone) {
+        e.preventDefault();
         selectNextWord();
       }
     };
 
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [meaningsVisible, assessmentDone, isTimerRunning, selectNextWord]);
+  }, [meaningsVisible, assessmentDone, isTimerRunning, earlyAssessmentMade, selectNextWord]);
 
   if (!sessionStarted) {
     return (
@@ -180,33 +211,11 @@ export default function NepaliWordMasterPage() {
               timerDuration={selectedTimerDuration}
               meaningsVisible={meaningsVisible}
               isLoadingWord={isLoadingWord}
+              onEarlyAssessment={handleEarlyAssessment}
+              onFinalAssessment={handleFinalAssessment}
+              showEarlyAssessment={!earlyAssessmentMade}
+              showFinalAssessment={meaningsVisible && !assessmentDone}
             />
-          )}
-
-          {meaningsVisible && !assessmentDone && (
-            <EnhancedAssessmentControls onAssess={handleAssessment} disabled={isLoadingWord} />
-          )}
-          
-          {assessmentDone && !isLoadingWord && currentWord && !isTimerRunning && !meaningsVisible && (
-            <Button 
-              onClick={selectNextWord} 
-              className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105" 
-              size="lg" 
-              disabled={isLoadingWord}
-            >
-              {isLoadingWord ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : null}
-              Next Word
-            </Button>
-          )}
-          {assessmentDone && isLoadingWord && currentWord && !isTimerRunning && !meaningsVisible && (
-            <Button 
-              className="w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg" 
-              size="lg" 
-              disabled={true}
-            >
-              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-              Loading Next Word...
-            </Button>
           )}
 
           <div className="flex space-x-4 mt-2 items-center">
