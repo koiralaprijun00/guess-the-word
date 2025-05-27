@@ -16,7 +16,17 @@ import { useSpacedRepetition } from "@/hooks/use-spaced-repetition";
 import { Loader2, Play } from "lucide-react";
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContentNoClose, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const TIMER_OPTIONS = [5, 8, 10, 15];
 
@@ -38,6 +48,7 @@ export default function NepaliWordMasterPage() {
   const [sessionStarted, setSessionStarted] = useState(false);
   const [earlyAssessmentMade, setEarlyAssessmentMade] = useState<boolean>(false);
   const [isClientMounted, setIsClientMounted] = useState(false);
+  const [showEndSessionConfirm, setShowEndSessionConfirm] = useState(false);
 
   const { toast } = useToast();
   const { sessionData, updateSessionData, clearSessionData } = useSessionPersistence();
@@ -169,12 +180,20 @@ export default function NepaliWordMasterPage() {
     return () => window.removeEventListener('keydown', handleKeyPress);
   }, [meaningsVisible, assessmentDone, isTimerRunning, earlyAssessmentMade, selectNextWord]);
 
+  const handleEndSession = () => {
+    setShowEndSessionConfirm(false);
+    setSessionStarted(false);
+  };
+
   return (
     <WordMasterErrorBoundary>
       <main className="flex flex-col items-center min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-blue-950 dark:to-indigo-900 p-4 selection:bg-primary/20 overflow-hidden">
-        {/* Timer Selection Modal */}
-        <Dialog open={!sessionStarted} onOpenChange={() => {}}>
-          <DialogContent className="sm:max-w-md">
+        {/* Timer Selection Modal - Cannot be closed without starting a session */}
+        <Dialog 
+          open={!sessionStarted} 
+          onOpenChange={() => {}} // Empty handler prevents closing via X button
+        >
+          <DialogContentNoClose className="sm:max-w-md">
             <DialogHeader>
               <DialogTitle className="text-center text-2xl font-bold bg-gradient-to-r from-gradient-yellow via-gradient-orange to-gradient-magenta bg-clip-text text-transparent">
                 Nepali Word Master
@@ -193,7 +212,7 @@ export default function NepaliWordMasterPage() {
                 <Play className="mr-2 h-5 w-5" /> Start Learning
               </Button>
             </div>
-          </DialogContent>
+          </DialogContentNoClose>
         </Dialog>
 
         <div className="w-full max-w-2xl flex flex-col justify-start space-y-8">
@@ -230,9 +249,28 @@ export default function NepaliWordMasterPage() {
                 allWordsLength={allWords.length}
               />
             </div>
+            <AlertDialog open={showEndSessionConfirm} onOpenChange={setShowEndSessionConfirm}>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>End Learning Session?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Your progress will be saved, but you'll need to start a new session to continue learning.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Continue Learning</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={handleEndSession}
+                    className="bg-red-500 hover:bg-red-600 text-white"
+                  >
+                    End Session
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
             <Button 
               variant="outline" 
-              onClick={() => setSessionStarted(false)} 
+              onClick={() => setShowEndSessionConfirm(true)} 
               className="h-full hover:bg-red-50 dark:hover:bg-red-950/20 hover:text-red-600 dark:hover:text-red-400 transition-colors duration-300"
             >
               End Session
