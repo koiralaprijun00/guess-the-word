@@ -2,9 +2,12 @@
 
 import type { Word } from "@/types"; 
 import { initialWordList } from "@/data/words";
-import { WordDisplayCard } from "@/components/app/WordDisplayCard";
-import { TimerSelector } from "@/components/app/TimerSelector";
-import { AssessmentControls } from "@/components/app/AssessmentControls";
+import { 
+  EnhancedWordDisplayCard,
+  EnhancedAssessmentControls,
+  EnhancedStatsCard,
+  EnhancedTimerSelector
+} from "@/components/enhanced";
 import { WordMasterErrorBoundary } from "@/components/app/WordMasterErrorBoundary";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -13,9 +16,14 @@ import { useSpacedRepetition } from "@/hooks/use-spaced-repetition";
 import { Loader2, Play } from "lucide-react";
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
 
 const TIMER_OPTIONS = [5, 8, 10, 15];
+
+interface SessionData {
+  totalKnown: number;
+  totalUnknown: number;
+  shownWordIds: number[];
+}
 
 export default function NepaliWordMasterPage() {
   const [allWords, setAllWords] = useState<Word[]>(() => initialWordList.map(w => ({...w}))); 
@@ -126,17 +134,21 @@ export default function NepaliWordMasterPage() {
   if (!sessionStarted) {
     return (
       <WordMasterErrorBoundary>
-        <div className="flex flex-col items-center justify-center min-h-screen bg-background text-foreground p-4">
-          <Card className="w-full max-w-md p-8 shadow-2xl">
+        <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-blue-950 dark:to-indigo-900 p-4">
+          <Card className="w-full max-w-md p-8 shadow-2xl bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 border-blue-200 dark:border-blue-800">
             <CardContent className="flex flex-col items-center space-y-8">
               <h1 className="text-4xl font-bold font-english text-center bg-gradient-to-r from-gradient-yellow via-gradient-orange to-gradient-magenta bg-clip-text text-transparent">
                 Nepali Word Master
               </h1>
-              <TimerSelector
+              <EnhancedTimerSelector
                 selectedDuration={selectedTimerDuration}
                 onDurationChange={handleTimerDurationChange}
               />
-              <Button size="lg" onClick={handleStartSession} className="w-full">
+              <Button 
+                size="lg" 
+                onClick={handleStartSession} 
+                className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+              >
                 <Play className="mr-2 h-5 w-5" /> Start Learning
               </Button>
             </CardContent>
@@ -148,63 +160,67 @@ export default function NepaliWordMasterPage() {
 
   return (
     <WordMasterErrorBoundary>
-      <main className="flex flex-col items-center min-h-screen bg-background text-foreground p-4 sm:p-6 md:p-8 selection:bg-primary/20">
+      <main className="flex flex-col items-center min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-blue-950 dark:to-indigo-900 p-4 sm:p-6 md:p-8 selection:bg-primary/20">
         <div className="w-full max-w-2xl space-y-8">
           <h1 className="text-3xl sm:text-4xl font-bold font-english text-center bg-gradient-to-r from-gradient-yellow via-gradient-orange to-gradient-magenta bg-clip-text text-transparent py-2">
             Nepali Word Master
           </h1>
 
-          <TimerSelector
+          <EnhancedTimerSelector
             selectedDuration={selectedTimerDuration}
             onDurationChange={handleTimerDurationChange}
             disabled={isTimerRunning || meaningsVisible || isLoadingWord} 
           />
 
-          <WordDisplayCard
-            word={currentWord}
-            timeLeft={timeLeft}
-            timerDuration={selectedTimerDuration}
-            meaningsVisible={meaningsVisible}
-            isLoadingWord={isLoadingWord}
-          />
+          {currentWord && (
+            <EnhancedWordDisplayCard
+              word={currentWord}
+              timeLeft={timeLeft}
+              timerDuration={selectedTimerDuration}
+              meaningsVisible={meaningsVisible}
+              isLoadingWord={isLoadingWord}
+            />
+          )}
 
           {meaningsVisible && !assessmentDone && (
-            <AssessmentControls onAssess={handleAssessment} disabled={isLoadingWord} />
+            <EnhancedAssessmentControls onAssess={handleAssessment} disabled={isLoadingWord} />
           )}
           
           {assessmentDone && !isLoadingWord && currentWord && !isTimerRunning && !meaningsVisible && (
-            <Button onClick={selectNextWord} className="w-full" size="lg" disabled={isLoadingWord}>
+            <Button 
+              onClick={selectNextWord} 
+              className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105" 
+              size="lg" 
+              disabled={isLoadingWord}
+            >
               {isLoadingWord ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : null}
               Next Word
             </Button>
           )}
           {assessmentDone && isLoadingWord && currentWord && !isTimerRunning && !meaningsVisible && (
-            <Button className="w-full" size="lg" disabled={true}>
+            <Button 
+              className="w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg" 
+              size="lg" 
+              disabled={true}
+            >
               <Loader2 className="mr-2 h-5 w-5 animate-spin" />
               Loading Next Word...
             </Button>
           )}
 
-          <Card className="mt-8">
-            <CardContent className="p-4 space-y-2 text-sm font-english">
-              <div className="flex justify-between">
-                <span>Total Known:</span>
-                <span className="font-semibold text-green-600">{sessionData?.totalKnown || 0}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Total Didn't Know:</span>
-                <span className="font-semibold text-red-600">{sessionData?.totalUnknown || 0}</span>
-              </div>
-              <div className="pt-2">
-                <div className="flex justify-between mb-1">
-                  <span>Session Progress:</span>
-                  <span>{sessionData?.shownWordIds?.length || 0} / {allWords.length} words</span>
-                </div>
-                <Progress value={progressPercentage} className="h-2 [&>div]:bg-primary" />
-              </div>
-            </CardContent>
-          </Card>
-          <Button variant="outline" onClick={() => setSessionStarted(false)} className="w-full mt-4">End Session</Button>
+          <EnhancedStatsCard
+            sessionData={sessionData || { totalKnown: 0, totalUnknown: 0, shownWordIds: [] }}
+            progressPercentage={progressPercentage}
+            allWordsLength={allWords.length}
+          />
+
+          <Button 
+            variant="outline" 
+            onClick={() => setSessionStarted(false)} 
+            className="w-full mt-4 hover:bg-red-50 dark:hover:bg-red-950/20 hover:text-red-600 dark:hover:text-red-400 transition-colors duration-300"
+          >
+            End Session
+          </Button>
         </div>
       </main>
     </WordMasterErrorBoundary>

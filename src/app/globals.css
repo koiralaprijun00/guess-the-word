@@ -52,6 +52,11 @@
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* Gradient colors for enhanced UI */
+    --gradient-yellow: 43 96% 56%;
+    --gradient-orange: 27 96% 61%;
+    --gradient-magenta: 326 100% 74%;
   }
 
   .dark {
@@ -99,6 +104,11 @@
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* Gradient colors for enhanced UI in dark mode */
+    --gradient-yellow: 43 96% 46%;
+    --gradient-orange: 27 96% 51%;
+    --gradient-magenta: 326 100% 64%;
   }
 }
 
@@ -124,4 +134,53 @@
 
 .font-english {
   font-family: var(--font-geist-sans), sans-serif;
+}
+
+/* Enhanced UI Animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-20px) rotate(180deg); }
+}
+
+@keyframes float-delayed {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-15px) rotate(-180deg); }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-float-delayed {
+  animation: float-delayed 8s ease-in-out infinite;
+}
+
+.rotate-y-180 {
+  transform: rotateY(180deg);
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+}
+
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.transform-style-preserve-3d {
+  transform-style: preserve-3d;
+}
+
+/* Gradient utilities */
+.from-gradient-yellow {
+  --tw-gradient-from: hsl(var(--gradient-yellow));
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgba(255, 255, 255, 0));
+}
+
+.via-gradient-orange {
+  --tw-gradient-stops: var(--tw-gradient-from), hsl(var(--gradient-orange)), var(--tw-gradient-to, rgba(255, 255, 255, 0));
+}
+
+.to-gradient-magenta {
+  --tw-gradient-to: hsl(var(--gradient-magenta));
 }
