@@ -162,7 +162,7 @@ export const EnhancedWordDisplayCard: React.FC<WordDisplayCardProps> = ({
 
               {/* Early Assessment Buttons - Inside Card */}
               {showEarlyAssessment && !meaningsVisible && !earlyAssessmentMade && (
-                <div className="flex justify-center space-x-4 mt-4">
+                <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4 mt-4">
                   <Button
                     variant="outline"
                     size="lg"
@@ -243,7 +243,7 @@ export const EnhancedWordDisplayCard: React.FC<WordDisplayCardProps> = ({
 
       {/* Final Assessment Buttons - After Meanings Shown */}
       {showFinalAssessment && meaningsVisible && (
-        <div className="flex justify-center space-x-4">
+        <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
           <Button
             variant="outline"
             size="lg"
