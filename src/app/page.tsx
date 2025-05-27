@@ -199,7 +199,7 @@ export default function NepaliWordMasterPage() {
                 Nepali Word Master
               </DialogTitle>
             </DialogHeader>
-            <div className="flex flex-col items-center space-y-6 py-4">
+            <div className="flex flex-col items-center space-y-6 py-4 w-full">
               <EnhancedTimerSelector
                 selectedDuration={selectedTimerDuration}
                 onDurationChange={handleTimerDurationChange}
@@ -215,12 +215,12 @@ export default function NepaliWordMasterPage() {
           </DialogContentNoClose>
         </Dialog>
 
-        <div className="w-full max-w-2xl flex flex-col justify-start space-y-8">
-          <div className="flex items-center justify-between mb-2">
-            <h1 className="text-2xl font-bold font-english bg-gradient-to-r from-gradient-yellow via-gradient-orange to-gradient-magenta bg-clip-text text-transparent">
+        <div className="w-full max-w-2xl flex flex-col justify-start space-y-8 sm:space-y-8">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2 gap-2 sm:gap-0">
+            <h1 className="text-2xl font-bold font-english bg-gradient-to-r from-gradient-yellow via-gradient-orange to-gradient-magenta bg-clip-text text-transparent text-center sm:text-left">
               Nepali Word Master
             </h1>
-            <div className="flex items-center gap-2 text-muted-foreground">
+            <div className="flex items-center gap-2 text-muted-foreground justify-center sm:justify-end">
               <Clock className="w-4 h-4" />
               <span className="text-xs font-medium uppercase tracking-wide">Time Duration</span>
               <span className="font-medium">{selectedTimerDuration}s</span>
@@ -241,7 +241,7 @@ export default function NepaliWordMasterPage() {
             />
           )}
 
-          <div className="flex space-x-4 mt-2 items-center">
+          <div className="flex flex-col gap-4 sm:flex-row sm:space-x-4 mt-2 items-stretch w-full">
             <div className="flex-1">
               <EnhancedStatsCard
                 sessionData={isClientMounted ? (sessionData || { totalKnown: 0, totalUnknown: 0, shownWordIds: [] }) : { totalKnown: 0, totalUnknown: 0, shownWordIds: [] }}
@@ -249,32 +249,15 @@ export default function NepaliWordMasterPage() {
                 allWordsLength={allWords.length}
               />
             </div>
-            <AlertDialog open={showEndSessionConfirm} onOpenChange={setShowEndSessionConfirm}>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>End Learning Session?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    Your progress will be saved, but you'll need to start a new session to continue learning.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Continue Learning</AlertDialogCancel>
-                  <AlertDialogAction
-                    onClick={handleEndSession}
-                    className="bg-red-500 hover:bg-red-600 text-white"
-                  >
-                    End Session
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-            <Button 
-              variant="outline" 
-              onClick={() => setShowEndSessionConfirm(true)} 
-              className="h-full hover:bg-red-50 dark:hover:bg-red-950/20 hover:text-red-600 dark:hover:text-red-400 transition-colors duration-300"
-            >
-              End Session
-            </Button>
+            <div className="flex flex-col gap-2 w-full sm:w-auto">
+              <Button 
+                variant="outline" 
+                onClick={() => setShowEndSessionConfirm(true)} 
+                className="w-full h-full hover:bg-red-50 dark:hover:bg-red-950/20 hover:text-red-600 dark:hover:text-red-400 transition-colors duration-300"
+              >
+                End Session
+              </Button>
+            </div>
           </div>
         </div>
       </main>
