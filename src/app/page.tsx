@@ -135,9 +135,9 @@ export default function NepaliWordMasterPage() {
     return (
       <WordMasterErrorBoundary>
         <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-blue-950 dark:to-indigo-900 p-4">
-          <Card className="w-full max-w-md p-8 shadow-2xl bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 border-blue-200 dark:border-blue-800">
-            <CardContent className="flex flex-col items-center space-y-8">
-              <h1 className="text-4xl font-bold font-english text-center bg-gradient-to-r from-gradient-yellow via-gradient-orange to-gradient-magenta bg-clip-text text-transparent">
+          <Card className="w-full max-w-md p-6 shadow-2xl bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 border-blue-200 dark:border-blue-800">
+            <CardContent className="flex flex-col items-center space-y-6">
+              <h1 className="text-3xl font-bold font-english text-center bg-gradient-to-r from-gradient-yellow via-gradient-orange to-gradient-magenta bg-clip-text text-transparent">
                 Nepali Word Master
               </h1>
               <EnhancedTimerSelector
@@ -160,17 +160,18 @@ export default function NepaliWordMasterPage() {
 
   return (
     <WordMasterErrorBoundary>
-      <main className="flex flex-col items-center min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-blue-950 dark:to-indigo-900 p-4 sm:p-6 md:p-8 selection:bg-primary/20">
-        <div className="w-full max-w-2xl space-y-8">
-          <h1 className="text-3xl sm:text-4xl font-bold font-english text-center bg-gradient-to-r from-gradient-yellow via-gradient-orange to-gradient-magenta bg-clip-text text-transparent py-2">
-            Nepali Word Master
-          </h1>
-
-          <EnhancedTimerSelector
-            selectedDuration={selectedTimerDuration}
-            onDurationChange={handleTimerDurationChange}
-            disabled={isTimerRunning || meaningsVisible || isLoadingWord} 
-          />
+      <main className="flex flex-col items-center min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-blue-950 dark:to-indigo-900 p-4 selection:bg-primary/20 overflow-hidden">
+        <div className="w-full max-w-2xl flex flex-col justify-start space-y-8">
+          <div className="flex items-center justify-between mb-2">
+            <h1 className="text-2xl font-bold font-english bg-gradient-to-r from-gradient-yellow via-gradient-orange to-gradient-magenta bg-clip-text text-transparent">
+              Nepali Word Master
+            </h1>
+            <EnhancedTimerSelector
+              selectedDuration={selectedTimerDuration}
+              onDurationChange={handleTimerDurationChange}
+              disabled={isTimerRunning || meaningsVisible || isLoadingWord} 
+            />
+          </div>
 
           {currentWord && (
             <EnhancedWordDisplayCard
@@ -208,19 +209,22 @@ export default function NepaliWordMasterPage() {
             </Button>
           )}
 
-          <EnhancedStatsCard
-            sessionData={sessionData || { totalKnown: 0, totalUnknown: 0, shownWordIds: [] }}
-            progressPercentage={progressPercentage}
-            allWordsLength={allWords.length}
-          />
-
-          <Button 
-            variant="outline" 
-            onClick={() => setSessionStarted(false)} 
-            className="w-full mt-4 hover:bg-red-50 dark:hover:bg-red-950/20 hover:text-red-600 dark:hover:text-red-400 transition-colors duration-300"
-          >
-            End Session
-          </Button>
+          <div className="flex space-x-4 mt-2 items-center">
+            <div className="flex-1">
+              <EnhancedStatsCard
+                sessionData={sessionData || { totalKnown: 0, totalUnknown: 0, shownWordIds: [] }}
+                progressPercentage={progressPercentage}
+                allWordsLength={allWords.length}
+              />
+            </div>
+            <Button 
+              variant="outline" 
+              onClick={() => setSessionStarted(false)} 
+              className="h-full hover:bg-red-50 dark:hover:bg-red-950/20 hover:text-red-600 dark:hover:text-red-400 transition-colors duration-300"
+            >
+              End Session
+            </Button>
+          </div>
         </div>
       </main>
     </WordMasterErrorBoundary>
