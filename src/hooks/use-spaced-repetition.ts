@@ -108,31 +108,52 @@ export function useSpacedRepetition(words: Word[]) {
     });
   };
 
+  const shuffleArray = <T,>(array: T[]): T[] => {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+  };
+
   const getNextWord = (): Word | null => {
     const now = new Date();
-    const availableWords = words.filter(word => {
+    
+    // Get words that are due for review
+    const dueWords = words.filter(word => {
       const nextReview = state.nextReviewDate.get(word.id);
       return !nextReview || nextReview <= now;
     });
 
-    if (availableWords.length === 0) {
+    if (dueWords.length === 0) {
       return null;
     }
 
-    // Sort by next review date and then randomly select from the earliest ones
-    const sortedWords = availableWords.sort((a, b) => {
-      const dateA = state.nextReviewDate.get(a.id) || new Date(0);
-      const dateB = state.nextReviewDate.get(b.id) || new Date(0);
-      return dateA.getTime() - dateB.getTime();
-    });
+    // Separate words into categories for better selection
+    const newWords = dueWords.filter(word => !state.wordStats.has(word.id));
+    const reviewWords = dueWords.filter(word => state.wordStats.has(word.id));
 
-    const earliestDate = state.nextReviewDate.get(sortedWords[0].id) || new Date(0);
-    const earliestWords = sortedWords.filter(word => {
-      const date = state.nextReviewDate.get(word.id) || new Date(0);
-      return date.getTime() === earliestDate.getTime();
-    });
+    // Prioritize review words, but include new words
+    let candidateWords: Word[];
+    
+    if (reviewWords.length > 0 && newWords.length > 0) {
+      // Mix of both: 70% review words, 30% new words
+      const reviewCount = Math.max(1, Math.floor(reviewWords.length * 0.7));
+      const newCount = Math.max(1, Math.floor(newWords.length * 0.3));
+      
+      candidateWords = [
+        ...shuffleArray(reviewWords).slice(0, reviewCount),
+        ...shuffleArray(newWords).slice(0, newCount)
+      ];
+    } else {
+      // Use all available words if only one category exists
+      candidateWords = dueWords;
+    }
 
-    return earliestWords[Math.floor(Math.random() * earliestWords.length)];
+    // Final shuffle and random selection
+    const shuffledCandidates = shuffleArray(candidateWords);
+    return shuffledCandidates[Math.floor(Math.random() * shuffledCandidates.length)];
   };
 
   return {
@@ -140,4 +161,4 @@ export function useSpacedRepetition(words: Word[]) {
     getNextWord,
     wordStats: state.wordStats
   };
-} 
+}
