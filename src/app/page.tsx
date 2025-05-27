@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2, Play } from "lucide-react";
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
 
 const TIMER_OPTIONS = [5, 8, 10, 15];
 const WORDS_PER_DIFFICULTY_TIER = 3; // Number of words to master before moving to next difficulty
