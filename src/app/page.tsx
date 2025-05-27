@@ -16,6 +16,7 @@ import { useSpacedRepetition } from "@/hooks/use-spaced-repetition";
 import { Loader2, Play } from "lucide-react";
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 const TIMER_OPTIONS = [5, 8, 10, 15];
 
@@ -162,15 +163,18 @@ export default function NepaliWordMasterPage() {
     return () => window.removeEventListener('keydown', handleKeyPress);
   }, [meaningsVisible, assessmentDone, isTimerRunning, earlyAssessmentMade, selectNextWord]);
 
-  if (!sessionStarted) {
-    return (
-      <WordMasterErrorBoundary>
-        <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-blue-950 dark:to-indigo-900 p-4">
-          <Card className="w-full max-w-md p-6 shadow-2xl bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 border-blue-200 dark:border-blue-800">
-            <CardContent className="flex flex-col items-center space-y-6">
-              <h1 className="text-3xl font-bold font-english text-center bg-gradient-to-r from-gradient-yellow via-gradient-orange to-gradient-magenta bg-clip-text text-transparent">
+  return (
+    <WordMasterErrorBoundary>
+      <main className="flex flex-col items-center min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-blue-950 dark:to-indigo-900 p-4 selection:bg-primary/20 overflow-hidden">
+        {/* Timer Selection Modal */}
+        <Dialog open={!sessionStarted} onOpenChange={() => {}}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="text-center text-2xl font-bold bg-gradient-to-r from-gradient-yellow via-gradient-orange to-gradient-magenta bg-clip-text text-transparent">
                 Nepali Word Master
-              </h1>
+              </DialogTitle>
+            </DialogHeader>
+            <div className="flex flex-col items-center space-y-6 py-4">
               <EnhancedTimerSelector
                 selectedDuration={selectedTimerDuration}
                 onDurationChange={handleTimerDurationChange}
@@ -182,16 +186,10 @@ export default function NepaliWordMasterPage() {
               >
                 <Play className="mr-2 h-5 w-5" /> Start Learning
               </Button>
-            </CardContent>
-          </Card>
-        </div>
-      </WordMasterErrorBoundary>
-    );
-  }
+            </div>
+          </DialogContent>
+        </Dialog>
 
-  return (
-    <WordMasterErrorBoundary>
-      <main className="flex flex-col items-center min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-blue-950 dark:to-indigo-900 p-4 selection:bg-primary/20 overflow-hidden">
         <div className="w-full max-w-2xl flex flex-col justify-start space-y-8">
           <div className="flex items-center justify-between mb-2">
             <h1 className="text-2xl font-bold font-english bg-gradient-to-r from-gradient-yellow via-gradient-orange to-gradient-magenta bg-clip-text text-transparent">
