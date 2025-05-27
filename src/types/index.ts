@@ -1,4 +1,4 @@
-export type WordDifficulty = 'easy' | 'intermediate' | 'difficult';
+// WordDifficulty type removed
 
 export interface Word {
   id: number;
@@ -6,5 +6,5 @@ export interface Word {
   roman: string;
   meaning_nepali: string;
   meaning_english: string;
-  difficulty?: WordDifficulty; // To be populated by AI
+  // difficulty field removed
 }

@@ -1,7 +1,8 @@
+
 "use client";
 
 import type { Word } from "@/types";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { DevanagariText } from "./DevanagariText";
 import { cn } from "@/lib/utils";
@@ -90,13 +91,7 @@ export function WordDisplayCard({
             <h3 className="text-sm font-english font-semibold uppercase text-foreground/60 tracking-wider">English Meaning</h3>
             <p className="text-xl font-english text-foreground/90">{word.meaning_english}</p>
           </div>
-           {word.difficulty && (
-             <div className="pt-2">
-                <span className="inline-flex items-center rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary ring-1 ring-inset ring-primary/30 font-english">
-                    Difficulty: {word.difficulty.charAt(0).toUpperCase() + word.difficulty.slice(1)}
-                </span>
-            </div>
-           )}
+           {/* Difficulty display removed */}
         </div>
       </CardContent>
     </Card>
