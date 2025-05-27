@@ -1,4 +1,3 @@
-
 import type { Word } from '@/types';
 
 // Updated to replace meaning_nepali with translations of meaning_english
@@ -49,5 +48,28 @@ export const initialWordList: Word[] = [
   { id: 42, nepali: "उपचार", roman: "Upacār", meaning_nepali: "उपचार (चिकित्सकीय); उपाय; शिष्टाचार, आतिथ्य।", meaning_english: "Treatment (medical); remedy; courtesy, hospitality." },
   { id: 43, nepali: "काव्य", roman: "Kāvya", meaning_nepali: "कविता, काव्य कृति।", meaning_english: "Poetry, poetic work." },
   { id: 44, nepali: "प्रवाहित", roman: "Pravāhita", meaning_nepali: "बगिरहेको, प्रवाहित; बगाएर लगेको।", meaning_english: "Flowing, streamed; carried away." },
+  { id: 45, nepali: "सन्निधान", roman: "Sannidhāna", meaning_nepali: "उपस्थिति, नजिक, निकटता; मनको लागाउने क्रिया।", meaning_english: "Presence, proximity, nearness; also, attention or application of mind." },
+  { id: 46, nepali: "अनात्मन्", roman: "Anātman", meaning_nepali: "आत्मा नभएको, आत्मा नहुने (विशेष गरी बौद्ध दर्शनमा प्रयोग हुने दार्शनिक अवधारणा)।", meaning_english: "Non-self, not the soul/spirit (a philosophical concept, especially in Buddhism)." },
+  { id: 47, nepali: "अभिनिवेश", roman: "Abhiniveśa", meaning_nepali: "दृढ आसक्ति, बलियो लगाव, जुनून; जीवनको इच्छा।", meaning_english: "Dogged adherence, strong attachment, obsession; also, the will to live." },
+  { id: 48, nepali: "उपादान", roman: "Upādāna", meaning_nepali: "भौतिक कारण, संघटक तत्व; सामग्री; अधिग्रहण।", meaning_english: "Material cause, constituent element; ingredient; appropriation." },
+  { id: 49, nepali: "क्षिप्रा", roman: "Kṣiprā", meaning_nepali: "छिटो, तीव्र, द्रुत; नदीको नाम पनि।", meaning_english: "Swift, quick, rapid; also, a proper name (e.g., of a river)." },
+  { id: 50, nepali: "दीप्ति", roman: "Dīpti", meaning_nepali: "चमक, प्रकाश, तेज, शोभा, ज्योति।", meaning_english: "Radiance, brilliance, luster, splendor, glow." },
+  { id: 51, nepali: "नैत्यिक", roman: "Naityika", meaning_nepali: "दैनिक, नियमित, परम्परागत (विशेष गरी कर्तव्य वा अनुष्ठानहरूमा)।", meaning_english: "Daily, regular, customary (especially referring to duties or rituals)." },
+  { id: 52, nepali: "पारगम्य", roman: "Pāragamya", meaning_nepali: "पार गर्न मिल्ने, भेद गर्न मिल्ने; बुझ्न मिल्ने।", meaning_english: "Permeable; penetrable; able to be traversed or understood." },
+  { id: 53, nepali: "प्रत्यागमन", roman: "Pratyāgamana", meaning_nepali: "फर्किने, वापस आउने।", meaning_english: "Return, coming back." },
+  { id: 54, nepali: "ब्रह्मचर्य", roman: "Brahmacarya", meaning_nepali: "ब्रह्मचर्य, ब्रह्मचारी जीवन; विद्यार्थी जीवन (विशेष गरी प्राचीन हिन्दू परम्परामा, आध्यात्मिक अध्ययनको अवधि)।", meaning_english: "Celibacy, continence; studentship (especially in ancient Hindu tradition, a period of spiritual study)." },
+  { id: 55, nepali: "विजिगीषु", roman: "Vijigīṣu", meaning_nepali: "विजयको इच्छा भएको, जित्ने महत्वाकांक्षी; विजेता।", meaning_english: "Desirous of victory, ambitious to conquer; a conqueror." },
+  { id: 56, nepali: "वैराग्य", roman: "Vairāgya", meaning_nepali: "वैराग्य, विश्वको इच्छाहरूबाट विमुख हुनु, त्याग।", meaning_english: "Detachment, dispassion, renunciation of worldly desires." },
+  { id: 57, nepali: "शास्त्रार्थ", roman: "Śāstrārtha", meaning_nepali: "पवित्र ग्रन्थ वा दार्शनिक सिद्धान्तहरूमा विद्वानहरूको बहस वा चर्चा।", meaning_english: "Scholarly debate or discussion on sacred texts or philosophical principles." },
+  { id: 58, nepali: "संज्ञा", roman: "Saṁjñā", meaning_nepali: "चेतना, बोध, अनुभूति; संज्ञा (व्याकरण)।", meaning_english: "Consciousness, perception, apprehension; noun (grammar)." },
+  { id: 59, nepali: "सुषुप्ति", roman: "Suṣupti", meaning_nepali: "गाढो निद्रा (सपना बिना); अचेतन अवस्था (दार्शनिक)।", meaning_english: "Deep sleep (without dreams); a state of unconsciousness (philosophical)." },
+  { id: 60, nepali: "अग्रगामी", roman: "Agragāmī", meaning_nepali: "अग्रसर, अग्रणी, अगाडि बढ्ने; अग्रणी।", meaning_english: "Leading, pioneering, going forward; a pioneer." },
+  { id: 61, nepali: "उपहास", roman: "Upahāsa", meaning_nepali: "उपहास, हास्यास्पद, व्यंग्य, तिरस्कार।", meaning_english: "Mockery, ridicule, derision, sarcasm." },
+  { id: 62, nepali: "अधुना", roman: "Adhunā", meaning_nepali: "आजकल, हाल, नजिकै।", meaning_english: "Nowadays, at present, recently." },
+  { id: 63, nepali: "व्युत्पत्ति", roman: "Vyutpatti", meaning_nepali: "शब्दको उत्पत्ति, व्युत्पत्ति; उत्पत्ति; विद्वत्ता, पाण्डित्य।", meaning_english: "Etymology, derivation (of words); origin; proficiency, erudition." },
+  { id: 64, nepali: "अव्यय", roman: "Avyaya", meaning_nepali: "अव्यय (व्याकरण, रूप परिवर्तन नहुने शब्द); अपरिवर्तनीय, अविनाशी।", meaning_english: "Indeclinable (grammar, a word that doesn't change form); immutable, imperishable." },
+  { id: 65, nepali: "प्रच्छन्न", roman: "Pracchanna", meaning_nepali: "लुकेको, छिपेको, गोप्य; भेष बदलेको।", meaning_english: "Hidden, concealed, secret; disguised." },
+  { id: 66, nepali: "तटस्थ", roman: "Taṭastha", meaning_nepali: "तटस्थ, निष्पक्ष, पक्षपातरहित; शाब्दिक अर्थमा 'किनारामा उभिएको'।", meaning_english: "Neutral, impartial, unbiased; literally 'standing on the bank.'" },
+  { id: 67, nepali: "अधिक्षेप", roman: "Adhikṣepa", meaning_nepali: "निन्दा, दोष, फटकार, अपमान।", meaning_english: "Censure, blame, reproach, insult." },
 ];
 
