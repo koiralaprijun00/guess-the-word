@@ -1,45 +1,72 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# dependencies
+# Dependencies
 /node_modules
 /.pnp
-.pnp.*
-.yarn/*
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/versions
+.pnp.js
+.yarn/install-state.gz
 
-# testing
+# Testing
 /coverage
 
-# next.js
+# Next.js
 /.next/
 /out/
 
-# production
+# Production
 /build
 
-# misc
+# Misc
 .DS_Store
 *.pem
+*.log
 
-# debug
+# Local Environment Variables
+.env
+.env*.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Log files
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-.pnpm-debug.log*
+pnpm-debug.log*
+lerna-debug.log*
 
-# vercel
-.vercel
+# Editor directories and files
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.idea
+*.project
+*.classpath
+*.c9/*
+*.launch
+.settings/
+*.sublime-workspace
 
-# typescript
-*.tsbuildinfo
-next-env.d.ts
-
-.genkit/*
-.env*
-
-# firebase
+# Firebase
+.firebase/
 firebase-debug.log
+database-debug.log
 firestore-debug.log
+storage-debug.log
+firebase-export-*.json
+firebase-export-*.zip
+*.firebase*
+
+# Genkit
+.genkit/
+.genkit/cache/
+.genkit/state/
+genkit-debug.log
+
+# Turborepo
+.turbo
+
+# IDX specific
+.idx/
