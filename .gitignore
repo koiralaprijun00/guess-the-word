@@ -49,22 +49,6 @@ lerna-debug.log*
 .settings/
 *.sublime-workspace
 
-# Firebase
-.firebase/
-firebase-debug.log
-database-debug.log
-firestore-debug.log
-storage-debug.log
-firebase-export-*.json
-firebase-export-*.zip
-*.firebase*
-
-# Genkit
-.genkit/
-.genkit/cache/
-.genkit/state/
-genkit-debug.log
-
 # Turborepo
 .turbo
 
