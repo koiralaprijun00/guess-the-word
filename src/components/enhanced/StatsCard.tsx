@@ -20,8 +20,9 @@ export const EnhancedStatsCard: React.FC<StatsCardProps> = ({
   progressPercentage,
   allWordsLength
 }) => {
-  const totalAnswered = (sessionData?.totalKnown || 0) + (sessionData?.totalUnknown || 0);
-  const accuracyRate = totalAnswered > 0 ? Math.round(((sessionData?.totalKnown || 0) / totalAnswered) * 100) : 0;
+  const safeSessionData = sessionData || { totalKnown: 0, totalUnknown: 0, shownWordIds: [] };
+  const totalAnswered = (safeSessionData.totalKnown || 0) + (safeSessionData.totalUnknown || 0);
+  const accuracyRate = totalAnswered > 0 ? Math.round(((safeSessionData.totalKnown || 0) / totalAnswered) * 100) : 0;
 
   return (
     <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 border-blue-200 dark:border-blue-800">
@@ -32,21 +33,21 @@ export const EnhancedStatsCard: React.FC<StatsCardProps> = ({
             <div className="flex justify-between items-center text-sm">
               <span className="font-medium">Progress</span>
               <span className="text-muted-foreground">
-                {sessionData?.shownWordIds?.length || 0}/{allWordsLength}
+                {safeSessionData.shownWordIds?.length || 0}/{allWordsLength || 0}
               </span>
             </div>
-            <Progress value={progressPercentage} className="h-2" />
+            <Progress value={progressPercentage || 0} className="h-2" />
           </div>
 
           {/* Stats */}
           <div className="flex justify-between items-center text-sm">
             <div className="flex items-center space-x-2 text-green-600">
               <CheckCircle2 className="w-4 h-4" />
-              <span>{sessionData?.totalKnown || 0} Known</span>
+              <span>{safeSessionData.totalKnown || 0} Known</span>
             </div>
             <div className="flex items-center space-x-2 text-orange-600">
               <XCircle className="w-4 h-4" />
-              <span>{sessionData?.totalUnknown || 0} Learning</span>
+              <span>{safeSessionData.totalUnknown || 0} Learning</span>
             </div>
             <div className="text-blue-600 font-medium">
               {accuracyRate}% Accuracy

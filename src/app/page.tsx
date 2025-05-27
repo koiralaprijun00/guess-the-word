@@ -37,10 +37,16 @@ export default function NepaliWordMasterPage() {
   const [isLoadingWord, setIsLoadingWord] = useState<boolean>(false);
   const [sessionStarted, setSessionStarted] = useState(false);
   const [earlyAssessmentMade, setEarlyAssessmentMade] = useState<boolean>(false);
+  const [isClientMounted, setIsClientMounted] = useState(false);
 
   const { toast } = useToast();
   const { sessionData, updateSessionData, clearSessionData } = useSessionPersistence();
   const { updateWordStats, getNextWord, wordStats } = useSpacedRepetition(allWords);
+
+  // Prevent hydration errors by only rendering with client data after mount
+  useEffect(() => {
+    setIsClientMounted(true);
+  }, []);
 
   const selectNextWord = useCallback(async () => {
     setIsLoadingWord(true);
@@ -132,9 +138,9 @@ export default function NepaliWordMasterPage() {
   };
 
   const progressPercentage = useMemo(() => {
-    if (allWords.length === 0) return 0;
+    if (!isClientMounted || allWords.length === 0) return 0;
     return ((sessionData?.shownWordIds?.length || 0) / allWords.length) * 100;
-  }, [sessionData?.shownWordIds?.length, allWords.length]);
+  }, [isClientMounted, sessionData?.shownWordIds?.length, allWords.length]);
 
   // Keyboard navigation
   useEffect(() => {
@@ -219,8 +225,8 @@ export default function NepaliWordMasterPage() {
           <div className="flex space-x-4 mt-2 items-center">
             <div className="flex-1">
               <EnhancedStatsCard
-                sessionData={sessionData || { totalKnown: 0, totalUnknown: 0, shownWordIds: [] }}
-                progressPercentage={progressPercentage}
+                sessionData={isClientMounted ? (sessionData || { totalKnown: 0, totalUnknown: 0, shownWordIds: [] }) : { totalKnown: 0, totalUnknown: 0, shownWordIds: [] }}
+                progressPercentage={isClientMounted ? progressPercentage : 0}
                 allWordsLength={allWords.length}
               />
             </div>
