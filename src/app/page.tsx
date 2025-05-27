@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useSessionPersistence } from "@/hooks/use-session-persistence";
 import { useSpacedRepetition } from "@/hooks/use-spaced-repetition";
-import { Loader2, Play } from "lucide-react";
+import { Loader2, Play, Clock } from "lucide-react";
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContentNoClose, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -220,11 +220,11 @@ export default function NepaliWordMasterPage() {
             <h1 className="text-2xl font-bold font-english bg-gradient-to-r from-gradient-yellow via-gradient-orange to-gradient-magenta bg-clip-text text-transparent">
               Nepali Word Master
             </h1>
-            <EnhancedTimerSelector
-              selectedDuration={selectedTimerDuration}
-              onDurationChange={handleTimerDurationChange}
-              disabled={isTimerRunning || meaningsVisible || isLoadingWord} 
-            />
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <Clock className="w-4 h-4" />
+              <span className="text-xs font-medium uppercase tracking-wide">Time Duration</span>
+              <span className="font-medium">{selectedTimerDuration}s</span>
+            </div>
           </div>
 
           {currentWord && (
