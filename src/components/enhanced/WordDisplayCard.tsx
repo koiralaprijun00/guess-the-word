@@ -138,12 +138,6 @@ export const EnhancedWordDisplayCard: React.FC<WordDisplayCardProps> = ({
           "absolute inset-0 shadow-2xl backface-hidden bg-gradient-to-br from-gradient-yellow via-gradient-orange to-gradient-magenta p-1 rotate-y-180"
         )}>
           <CardContent className="bg-card p-8 rounded-md h-full flex flex-col justify-center space-y-6 relative overflow-hidden">
-            {/* Success animation */}
-            <div className="absolute top-4 right-4">
-              <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center animate-bounce">
-                <CheckCircle2 className="w-5 h-5 text-white" />
-              </div>
-            </div>
 
             <div className="space-y-6 text-center">
               {/* Romanization */}
