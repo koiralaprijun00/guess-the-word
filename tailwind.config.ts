@@ -59,7 +59,11 @@ export default {
   				'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
   				border: 'hsl(var(--sidebar-border))',
   				ring: 'hsl(var(--sidebar-ring))'
-  			}
+  			},
+        // Custom gradient colors
+        'gradient-yellow': '#FFD700', // Bright Yellow
+        'gradient-orange': '#FFA500', // Vibrant Orange
+        'gradient-magenta': '#FF00FF', // Deep Magenta
   		},
   		borderRadius: {
   			lg: 'var(--radius)',
