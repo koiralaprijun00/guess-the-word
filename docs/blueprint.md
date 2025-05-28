@@ -1,4 +1,4 @@
-# **App Name**: Nepali Word Master
+# **App Name**: Jhole Nepali Shabda
 
 ## Core Features:
 

@@ -195,11 +195,11 @@ export default function NepaliWordMasterPage() {
         >
           <DialogContentNoClose className="sm:max-w-md">
             <DialogHeader>
-              <DialogTitle className="text-center text-2xl font-bold bg-gradient-to-r from-gradient-yellow via-gradient-orange to-gradient-magenta bg-clip-text text-transparent">
-                Nepali Word Master
+              <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-gradient-yellow via-gradient-orange to-gradient-magenta bg-clip-text text-transparent">
+              Jhole Nepali Shabda
               </DialogTitle>
             </DialogHeader>
-            <div className="flex flex-col items-center space-y-6 py-4 w-full">
+            <div className="flex flex-col items-center space-y-6 w-full">
               <EnhancedTimerSelector
                 selectedDuration={selectedTimerDuration}
                 onDurationChange={handleTimerDurationChange}
@@ -207,9 +207,9 @@ export default function NepaliWordMasterPage() {
               <Button 
                 size="lg" 
                 onClick={handleStartSession} 
-                className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                className="w-full bg-gradient-to-r from-yellow-500 to-orange-700 hover:from-yellow-600 hover:to-orange-800 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
               >
-                <Play className="mr-2 h-5 w-5" /> Start Learning
+                <Play className="mr-2 h-5 w-5" /> Start Guessing
               </Button>
             </div>
           </DialogContentNoClose>
@@ -218,7 +218,7 @@ export default function NepaliWordMasterPage() {
         <div className="w-full max-w-2xl flex flex-col justify-start space-y-8 sm:space-y-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2 gap-2 sm:gap-0">
             <h1 className="text-2xl font-bold font-english bg-gradient-to-r from-gradient-yellow via-gradient-orange to-gradient-magenta bg-clip-text text-transparent text-center sm:text-left">
-              Nepali Word Master
+              Jhole Nepali Shabda
             </h1>
             <div className="flex items-center gap-2 text-muted-foreground justify-center sm:justify-end">
               <Clock className="w-4 h-4" />

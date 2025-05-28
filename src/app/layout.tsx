@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Nepali Word Master',
+  title: 'Jhole Nepali Shabda',
   description: 'Master Nepali vocabulary with AI-paced learning.',
 };
 
