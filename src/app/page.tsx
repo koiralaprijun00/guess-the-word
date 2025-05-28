@@ -1,313 +1,48 @@
 "use client";
 
-import type { Word, WordDifficulty } from "@/types"; 
-import { initialWordList } from "../data/words";
-import { 
-  EnhancedWordDisplayCard,
-  EnhancedAssessmentControls,
-  EnhancedStatsCard
-} from "@/components/enhanced";
-import TimerSelector from "@/components/enhanced/TimerSelector";
+import React from 'react';
 import { WordMasterErrorBoundary } from "@/components/app/WordMasterErrorBoundary";
-import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
-import { useSessionPersistence } from "@/hooks/use-session-persistence";
-import { useSpacedRepetition } from "@/hooks/use-spaced-repetition";
-import { Loader2, Play, Clock } from "lucide-react";
-import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Dialog, DialogContentNoClose, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-
-interface SessionData {
-  totalKnown: number;
-  totalUnknown: number;
-  shownWordIds: number[];
-  difficulty?: WordDifficulty;
-  timerDuration?: number;
-}
+import { GameStateProvider } from '@/components/game/GameStateProvider';
+import { GameHeader } from '@/components/game/GameHeader';
+import { GameSetupModal } from '@/components/game/GameSetupModal';
+import { WordDisplaySection } from '@/components/game/WordDisplaySection';
+import { ProgressSection } from '@/components/game/ProgressSection';
+import { SessionEndDialog } from '@/components/game/SessionEndDialog';
+import { KeyboardNavigationHandler } from '@/components/game/KeyboardNavigationHandler';
+import { GameTimerEffect } from '@/components/game/GameTimerEffect';
 
 export default function NepaliWordMasterPage() {
-  const [selectedDifficulty, setSelectedDifficulty] = useState<WordDifficulty>('medium');
-  const [selectedTimerDuration, setSelectedTimerDuration] = useState<number>(10);
-  const [currentWord, setCurrentWord] = useState<Word | null>(null);
-  const [timeLeft, setTimeLeft] = useState<number>(selectedTimerDuration);
-  const [isTimerRunning, setIsTimerRunning] = useState<boolean>(false);
-  const [meaningsVisible, setMeaningsVisible] = useState<boolean>(false);
-  const [assessmentDone, setAssessmentDone] = useState<boolean>(true); 
-  const [isLoadingWord, setIsLoadingWord] = useState<boolean>(false);
-  const [sessionStarted, setSessionStarted] = useState(false);
-  const [earlyAssessmentMade, setEarlyAssessmentMade] = useState<boolean>(false);
-  const [isClientMounted, setIsClientMounted] = useState(false);
-  const [showEndSessionConfirm, setShowEndSessionConfirm] = useState(false);
-
-  const { toast } = useToast();
-  const { sessionData, updateSessionData, clearSessionData, resetSessionData } = useSessionPersistence();
-  const { updateWordStats, resetWordStats, getNextWord, wordStats } = useSpacedRepetition({ difficulty: selectedDifficulty });
-
-  // Get filtered words by difficulty
-  const filteredWords = useMemo(() => {
-    return initialWordList.filter((word: Word) => word.difficulty === selectedDifficulty);
-  }, [selectedDifficulty]);
-
-  // Prevent hydration errors by only rendering with client data after mount
-  useEffect(() => {
-    setIsClientMounted(true);
-  }, []);
-
-  const selectNextWord = useCallback(async (overrideTimerDuration?: number) => {
-    setIsLoadingWord(true);
-    setMeaningsVisible(false);
-    setAssessmentDone(false);
-    setEarlyAssessmentMade(false);
-  
-    const nextWord = getNextWord();
-  
-    if (!nextWord) {
-      toast({ title: "Session Complete!", description: "You've reviewed all available words for this game mode." });
-      setIsTimerRunning(false);
-      setSessionStarted(false);
-      setIsLoadingWord(false);
-      return;
-    }
-  
-    setCurrentWord(nextWord);
-    
-    // Add word to session data after a brief delay to ensure proper state sync
-    setTimeout(() => {
-      updateSessionData({
-        shownWordIds: [...(sessionData?.shownWordIds || []), nextWord.id]
-      });
-    }, 100);
-    
-    // Use override duration if provided, otherwise use current state
-    const timerDuration = overrideTimerDuration ?? selectedTimerDuration;
-    setTimeLeft(timerDuration);
-    setIsTimerRunning(true);
-    setIsLoadingWord(false);
-  }, [
-    getNextWord,
-    selectedTimerDuration,
-    toast,
-    sessionData,
-    updateSessionData
-  ]);
-
-  useEffect(() => {
-    let timerId: NodeJS.Timeout;
-    if (isTimerRunning && timeLeft > 0) {
-      timerId = setTimeout(() => {
-        setTimeLeft(prevTime => prevTime - 1);
-      }, 1000);
-    } else if (isTimerRunning && timeLeft === 0) {
-      setIsTimerRunning(false);
-      setMeaningsVisible(true);
-    }
-    return () => clearTimeout(timerId);
-  }, [isTimerRunning, timeLeft]);
-
-  const handleStartSession = (timerMinutes: number, difficulty: WordDifficulty) => {
-    setSelectedTimerDuration(timerMinutes);
-    setSelectedDifficulty(difficulty);
-    setSessionStarted(true);
-    
-    // Reset session data with fresh initial values (only core session fields)
-    resetSessionData({});
-    
-    setCurrentWord(null); 
-    
-    // Delay selectNextWord to ensure resetSessionData takes effect first
-    setTimeout(() => {
-      selectNextWord(timerMinutes);
-    }, 0);
-  };
-
-  const handleEarlyAssessment = (knewIt: boolean) => {
-    if (!currentWord) return;
-    
-    setEarlyAssessmentMade(true);
-    setIsTimerRunning(false);
-    setMeaningsVisible(true);
-    
-    // If they knew it early, we can skip to next word after showing meaning briefly
-    if (knewIt) {
-      setTimeout(() => {
-        handleFinalAssessment(true);
-      }, 2000); // Show meaning for 2 seconds then proceed
-    }
-  };
-
-  const handleFinalAssessment = (knewIt: boolean) => {
-    if (!currentWord) return;
-
-    setAssessmentDone(true);
-    updateWordStats(currentWord.id, knewIt);
-    updateSessionData({
-      totalKnown: (sessionData?.totalKnown || 0) + (knewIt ? 1 : 0),
-      totalUnknown: (sessionData?.totalUnknown || 0) + (knewIt ? 0 : 1)
-    });
-    
-    // Auto-proceed to next word after a short delay
-    setTimeout(() => {
-      selectNextWord();
-    }, 1000);
-  };
-
-  const handleTimerDurationChange = (duration: number) => {
-    setSelectedTimerDuration(duration);
-    if (!isTimerRunning && !meaningsVisible) { 
-      setTimeLeft(duration);
-    }
-  };
-
-  const progressPercentage = useMemo(() => {
-    if (!isClientMounted || filteredWords.length === 0) return 0;
-    return ((sessionData?.shownWordIds?.length || 0) / filteredWords.length) * 100;
-  }, [isClientMounted, sessionData?.shownWordIds?.length, filteredWords.length]);
-
-  // Keyboard navigation
-  useEffect(() => {
-    const handleKeyPress = (e: KeyboardEvent) => {
-      if (e.key === 'y' || e.key === 'Y') {
-        if (!meaningsVisible && !earlyAssessmentMade) {
-          handleEarlyAssessment(true);
-        } else if (meaningsVisible && !assessmentDone) {
-          handleFinalAssessment(true);
-        }
-      }
-      if (e.key === 'n' || e.key === 'N') {
-        if (!meaningsVisible && !earlyAssessmentMade) {
-          handleEarlyAssessment(false);
-        } else if (meaningsVisible && !assessmentDone) {
-          handleFinalAssessment(false);
-        }
-      }
-      if (e.key === ' ' && !isTimerRunning && !meaningsVisible && assessmentDone) {
-        e.preventDefault();
-        selectNextWord();
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyPress);
-    return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [meaningsVisible, assessmentDone, isTimerRunning, earlyAssessmentMade, selectNextWord]);
-
-  const handleEndSession = () => {
-    setShowEndSessionConfirm(false);
-    setSessionStarted(false);
-    
-    // Reset all session data and progress
-    resetSessionData({});
-    resetWordStats(); // Reset spaced repetition progress
-    
-    // Reset current word state
-    setCurrentWord(null);
-    setMeaningsVisible(false);
-    setAssessmentDone(true);
-    setEarlyAssessmentMade(false);
-    setIsTimerRunning(false);
-    setTimeLeft(selectedTimerDuration);
-  };
-
   return (
     <WordMasterErrorBoundary>
-      <main className="flex flex-col items-center min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-blue-950 dark:to-indigo-900 p-4 selection:bg-primary/20 overflow-hidden">
-        {/* Timer Selection Modal - Cannot be closed without starting a session */}
-        <Dialog 
-          open={!sessionStarted} 
-          onOpenChange={() => {}} // Empty handler prevents closing via X button
-        >
-          <DialogContentNoClose className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-gradient-yellow via-gradient-orange to-gradient-magenta bg-clip-text text-transparent">
-              Jhole Nepali Shabda
-              </DialogTitle>
-            </DialogHeader>
-            <TimerSelector
-              onStartGame={handleStartSession}
-            />
-          </DialogContentNoClose>
-        </Dialog>
-
-        <div className="w-full max-w-2xl flex flex-col justify-start space-y-8 sm:space-y-8">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2 gap-2 sm:gap-0">
-            <h1 className="text-2xl font-bold font-english bg-gradient-to-r from-gradient-yellow via-gradient-orange to-gradient-magenta bg-clip-text text-transparent text-center sm:text-left">
-              Jhole Nepali Shabda
-            </h1>
-            <div className="flex items-center gap-4 text-muted-foreground justify-center sm:justify-end">
-              <div className="flex items-center gap-2">
-                <Clock className="w-4 h-4" />
-                <span className="text-xs font-medium uppercase tracking-wide">Time Duration</span>
-                <span className="font-medium">{selectedTimerDuration}s</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-medium uppercase tracking-wide">Game Mode</span>
-                <span className="font-medium capitalize">{selectedDifficulty}</span>
-              </div>
-            </div>
+      <GameStateProvider>
+        <main className="flex flex-col items-center min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-blue-950 dark:to-indigo-900 p-4 selection:bg-primary/20 overflow-hidden">
+          
+          {/* Game Setup Modal */}
+          <GameSetupModal />
+          
+          {/* Main Game Content */}
+          <div className="w-full max-w-2xl flex flex-col justify-start space-y-8 sm:space-y-8">
+            
+            {/* Header with Game Info */}
+            <GameHeader />
+            
+            {/* Word Display Section */}
+            <WordDisplaySection />
+            
+            {/* Progress and Controls */}
+            <ProgressSection />
+            
           </div>
-
-          {currentWord && (
-            <EnhancedWordDisplayCard
-              word={currentWord}
-              timeLeft={timeLeft}
-              timerDuration={selectedTimerDuration}
-              meaningsVisible={meaningsVisible}
-              isLoadingWord={isLoadingWord}
-              onEarlyAssessment={handleEarlyAssessment}
-              onFinalAssessment={handleFinalAssessment}
-              showEarlyAssessment={!earlyAssessmentMade}
-              showFinalAssessment={meaningsVisible && !assessmentDone}
-            />
-          )}
-
-          <div className="flex flex-col gap-4 sm:flex-row sm:space-x-4 mt-2 items-stretch w-full">
-            <div className="flex-1">
-              <EnhancedStatsCard
-                sessionData={isClientMounted ? (sessionData || { totalKnown: 0, totalUnknown: 0, shownWordIds: [] }) : { totalKnown: 0, totalUnknown: 0, shownWordIds: [] }}
-                progressPercentage={isClientMounted ? progressPercentage : 0}
-                allWordsLength={filteredWords.length}
-              />
-            </div>
-            <div className="flex flex-col gap-2 w-full sm:w-auto">
-              <Button 
-                variant="outline" 
-                onClick={() => setShowEndSessionConfirm(true)} 
-                className="w-full h-full hover:bg-red-50 dark:hover:bg-red-950/20 hover:text-red-600 dark:hover:text-red-400 transition-colors duration-300"
-              >
-                End Session
-              </Button>
-            </div>
-          </div>
-        </div>
-      </main>
-
-      {/* End Session Confirmation Dialog */}
-      <AlertDialog open={showEndSessionConfirm} onOpenChange={setShowEndSessionConfirm}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>End Current Session?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to end your current learning session? This will reset all progress and statistics, giving you a completely fresh start for your next session.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Continue Learning</AlertDialogCancel>
-            <AlertDialogAction onClick={handleEndSession}>
-              End Session
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+          
+          {/* Session End Confirmation */}
+          <SessionEndDialog />
+          
+          {/* Side Effect Handlers */}
+          <KeyboardNavigationHandler />
+          <GameTimerEffect />
+          
+        </main>
+      </GameStateProvider>
     </WordMasterErrorBoundary>
   );
 }
