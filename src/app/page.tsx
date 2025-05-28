@@ -51,7 +51,7 @@ export default function NepaliWordMasterPage() {
   const [showEndSessionConfirm, setShowEndSessionConfirm] = useState(false);
 
   const { toast } = useToast();
-  const { sessionData, updateSessionData, clearSessionData } = useSessionPersistence();
+  const { sessionData, updateSessionData, clearSessionData, resetSessionData } = useSessionPersistence();
   const { updateWordStats, getNextWord, wordStats } = useSpacedRepetition({ difficulty: selectedDifficulty });
 
   // Get filtered words by difficulty
@@ -64,7 +64,7 @@ export default function NepaliWordMasterPage() {
     setIsClientMounted(true);
   }, []);
 
-  const selectNextWord = useCallback(async () => {
+  const selectNextWord = useCallback(async (overrideTimerDuration?: number) => {
     setIsLoadingWord(true);
     setMeaningsVisible(false);
     setAssessmentDone(false);
@@ -81,10 +81,17 @@ export default function NepaliWordMasterPage() {
     }
   
     setCurrentWord(nextWord);
-    updateSessionData({
-      shownWordIds: [...(sessionData?.shownWordIds || []), nextWord.id]
-    });
-    setTimeLeft(selectedTimerDuration);
+    
+    // Add word to session data after a brief delay to ensure proper state sync
+    setTimeout(() => {
+      updateSessionData({
+        shownWordIds: [...(sessionData?.shownWordIds || []), nextWord.id]
+      });
+    }, 100);
+    
+    // Use override duration if provided, otherwise use current state
+    const timerDuration = overrideTimerDuration ?? selectedTimerDuration;
+    setTimeLeft(timerDuration);
     setIsTimerRunning(true);
     setIsLoadingWord(false);
   }, [
@@ -112,13 +119,16 @@ export default function NepaliWordMasterPage() {
     setSelectedTimerDuration(timerMinutes);
     setSelectedDifficulty(difficulty);
     setSessionStarted(true);
-    clearSessionData();
-    updateSessionData({
-      difficulty,
-      timerDuration: timerMinutes
-    } as Partial<SessionData>);
+    
+    // Reset session data with fresh initial values (only core session fields)
+    resetSessionData({});
+    
     setCurrentWord(null); 
-    selectNextWord();
+    
+    // Delay selectNextWord to ensure resetSessionData takes effect first
+    setTimeout(() => {
+      selectNextWord(timerMinutes);
+    }, 0);
   };
 
   const handleEarlyAssessment = (knewIt: boolean) => {

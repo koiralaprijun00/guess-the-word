@@ -46,9 +46,22 @@ export function useSessionPersistence() {
     localStorage.removeItem('nepali-word-session');
   };
 
+  const resetSessionData = (initialData: Partial<SessionData>) => {
+    const newSessionData = {
+      shownWordIds: [],
+      totalKnown: 0,
+      totalUnknown: 0,
+      lastSessionDate: new Date().toISOString(),
+      ...initialData
+    };
+    setSessionData(newSessionData);
+    localStorage.setItem('nepali-word-session', JSON.stringify(newSessionData));
+  };
+
   return {
     sessionData,
     updateSessionData,
-    clearSessionData
+    clearSessionData,
+    resetSessionData
   };
 } 
