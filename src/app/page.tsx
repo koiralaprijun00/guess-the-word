@@ -73,7 +73,7 @@ export default function NepaliWordMasterPage() {
     const nextWord = getNextWord();
   
     if (!nextWord) {
-      toast({ title: "Session Complete!", description: "You've reviewed all available words for this difficulty." });
+      toast({ title: "Session Complete!", description: "You've reviewed all available words for this game mode." });
       setIsTimerRunning(false);
       setSessionStarted(false);
       setIsLoadingWord(false);
@@ -243,10 +243,16 @@ export default function NepaliWordMasterPage() {
             <h1 className="text-2xl font-bold font-english bg-gradient-to-r from-gradient-yellow via-gradient-orange to-gradient-magenta bg-clip-text text-transparent text-center sm:text-left">
               Jhole Nepali Shabda
             </h1>
-            <div className="flex items-center gap-2 text-muted-foreground justify-center sm:justify-end">
-              <Clock className="w-4 h-4" />
-              <span className="text-xs font-medium uppercase tracking-wide">Time Duration</span>
-              <span className="font-medium">{selectedTimerDuration}s</span>
+            <div className="flex items-center gap-4 text-muted-foreground justify-center sm:justify-end">
+              <div className="flex items-center gap-2">
+                <Clock className="w-4 h-4" />
+                <span className="text-xs font-medium uppercase tracking-wide">Time Duration</span>
+                <span className="font-medium">{selectedTimerDuration}s</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-medium uppercase tracking-wide">Game Mode</span>
+                <span className="font-medium capitalize">{selectedDifficulty}</span>
+              </div>
             </div>
           </div>
 

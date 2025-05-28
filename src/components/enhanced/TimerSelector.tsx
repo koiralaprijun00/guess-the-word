@@ -50,16 +50,16 @@ export default function TimerSelector({ onStartGame }: TimerSelectorProps) {
             Choose Settings
           </h2>
           <p className="text-sm text-gray-600">
-            Select difficulty level and time per word
+            Select game mode and time per word
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Difficulty Selection */}
+          {/* Game Mode Selection */}
           <div>
             <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
               <Brain className="h-5 w-5 text-purple-600" />
-              Difficulty Level
+              Game Mode
             </h3>
             <div className="space-y-2">
               {DIFFICULTY_OPTIONS.map((option) => {
