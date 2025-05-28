@@ -1,118 +1,132 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { Clock, Star, Brain, Zap, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Clock, Brain, CheckCircle, Play } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import type { WordDifficulty } from '@/types';
 
 interface TimerSelectorProps {
-  selectedDuration: number;
-  onDurationChange: (duration: number) => void;
-  onStartLearning?: () => void;
-  disabled?: boolean;
+  onStartGame: (timerMinutes: number, difficulty: WordDifficulty) => void;
 }
 
-export const EnhancedTimerSelector: React.FC<TimerSelectorProps> = ({
-  selectedDuration,
-  onDurationChange,
-  onStartLearning,
-  disabled = false
-}) => {
-  const options = [5, 8, 10, 15];
+const TIMER_OPTIONS = [
+  { value: 5, label: '5 सेकेन्ड' },
+  { value: 10, label: '10 सेकेन्ड' },
+  { value: 15, label: '15 सेकेन्ड' },
+  { value: 20, label: '20 सेकेन्ड' }
+];
 
-  const features = [
-    {
-      icon: Clock,
-      title: "Timed Challenges",
-      description: "Test your recall with customizable timers for different difficulty levels",
-      color: "from-blue-400 to-blue-600"
-    },
-    {
-      icon: Brain,
-      title: "Smart Learning",
-      description: "AI-powered system adjusts to your knowledge level and learning pace",
-      color: "from-purple-400 to-purple-600"
-    },
-    {
-      icon: CheckCircle,
-      title: "Self Assessment",
-      description: "Track your progress and focus on words you find challenging",
-      color: "from-green-400 to-green-600"
-    }
-  ];
+const DIFFICULTY_OPTIONS = [
+  { 
+    value: 'easy' as WordDifficulty, 
+    label: 'सजिलो (Easy)', 
+    icon: Star
+  },
+  { 
+    value: 'medium' as WordDifficulty, 
+    label: 'मध्यम (Medium)', 
+    icon: Brain
+  },
+  { 
+    value: 'difficult' as WordDifficulty, 
+    label: 'कठिन (Difficult)', 
+    icon: Zap
+  }
+];
+
+export default function TimerSelector({ onStartGame }: TimerSelectorProps) {
+  const [selectedTimer, setSelectedTimer] = useState<number>(10);
+  const [selectedDifficulty, setSelectedDifficulty] = useState<WordDifficulty>('medium');
+
+  const handleStartGame = () => {
+    onStartGame(selectedTimer, selectedDifficulty);
+  };
 
   return (
-    <div className="max-w-xl mx-auto space-y-3 max-h-[50vh] overflow-y-auto">
-      {/* Header */}
-      <div className="flex items-center space-x-3 mb-3">
-        <div className="text-left space-y-1 flex-1">
-          <h2 className="text-base font-bold text-foreground">
-            Do you know or recognize these words?
+    <div className="max-h-[50vh] overflow-y-auto">
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            Choose Settings
           </h2>
-          
-          <p className="text-sm text-muted-foreground">
-            Test your knowledge with a <span className="text-red-500 font-semibold">fun</span>, challenging approach
+          <p className="text-sm text-gray-600">
+            Select difficulty level and time per word
           </p>
         </div>
-      </div>
 
-      {/* Feature Cards */}
-      <div className="grid grid-cols-1 gap-2">
-        {features.map((feature, index) => (
-          <Card key={index} className="hover:shadow-md transition-all duration-200 border">
-            <CardContent className="p-3 flex items-center space-x-3">
-              <div className={cn(
-                "w-8 h-8 rounded-full bg-gradient-to-r flex items-center justify-center flex-shrink-0",
-                feature.color
-              )}>
-                <feature.icon className="w-4 h-4 text-white" />
-              </div>
-              
-              <div className="text-left space-y-0">
-                <h3 className="text-sm font-bold text-foreground">
-                  {feature.title}
-                </h3>
-                
-                <p className="text-xs text-muted-foreground leading-tight">
-                  {feature.description}
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {/* Timer Selection */}
-      <Card className="border">
-        <CardContent className="p-4">
-          <div className="text-center space-y-3">
-            <div className="flex items-center justify-center space-x-2">
-              <Clock className="w-4 h-4 text-muted-foreground" />
-              <h3 className="text-base font-semibold text-foreground">Timer Duration</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Difficulty Selection */}
+          <div>
+            <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+              <Brain className="h-5 w-5 text-purple-600" />
+              Difficulty Level
+            </h3>
+            <div className="space-y-2">
+              {DIFFICULTY_OPTIONS.map((option) => {
+                const IconComponent = option.icon;
+                return (
+                  <div
+                    key={option.value}
+                    className={`p-3 rounded-lg border-2 cursor-pointer transition-all ${
+                      selectedDifficulty === option.value
+                        ? 'border-purple-500 bg-purple-50'
+                        : 'border-gray-200 hover:border-purple-300'
+                    }`}
+                    onClick={() => setSelectedDifficulty(option.value)}
+                  >
+                    <div className="flex items-center gap-3">
+                      <IconComponent className={`h-4 w-4 ${
+                        selectedDifficulty === option.value ? 'text-purple-600' : 'text-gray-500'
+                      }`} />
+                      <span className="font-medium text-gray-900">{option.label}</span>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
-            
-            <div className="flex justify-center space-x-2">
-              {options.map((option) => (
-                <Button
-                  key={option}
-                  variant={selectedDuration === option ? "default" : "outline"}
-                  size="sm"
-                  className={cn(
-                    "min-w-[3rem] font-semibold transition-all duration-200",
-                    selectedDuration === option ? 
-                      "bg-gradient-to-r from-yellow-500 to-orange-700 hover:from-yellow-600 hover:to-orange-800 text-white" :
-                      "hover:bg-gray-50",
-                    disabled && "opacity-50 cursor-not-allowed"
-                  )}
-                  onClick={() => onDurationChange(option)}
-                  disabled={disabled}
+          </div>
+
+          {/* Timer Selection */}
+          <div>
+            <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+              <Clock className="h-5 w-5 text-blue-600" />
+              Time Per Word
+            </h3>
+            <div className="space-y-2">
+              {TIMER_OPTIONS.map((option) => (
+                <div
+                  key={option.value}
+                  className={`p-3 rounded-lg border-2 cursor-pointer transition-all ${
+                    selectedTimer === option.value
+                      ? 'border-blue-500 bg-blue-50'
+                      : 'border-gray-200 hover:border-blue-300'
+                  }`}
+                  onClick={() => setSelectedTimer(option.value)}
                 >
-                  {option}s
-                </Button>
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium text-gray-900">{option.label}</span>
+                    <Clock className={`h-4 w-4 ${
+                      selectedTimer === option.value ? 'text-blue-600' : 'text-gray-400'
+                    }`} />
+                  </div>
+                </div>
               ))}
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+
+        {/* Start Button */}
+        <div className="text-center pt-4">
+          <Button
+            onClick={handleStartGame}
+            size="lg"
+            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 w-full md:w-auto"
+          >
+            <Play className="h-5 w-5 mr-2" />
+            Start Learning
+          </Button>
+        </div>
+      </div>
     </div>
   );
-}; 
+} 

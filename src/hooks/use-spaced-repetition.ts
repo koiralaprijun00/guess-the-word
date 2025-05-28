@@ -1,5 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import type { Word } from '@/types';
+import { initialWordList } from '@/data/words';
+import type { WordDifficulty } from '@/types';
 
 interface WordStats {
   id: number;
@@ -18,7 +20,11 @@ interface SpacedRepetitionState {
 const INITIAL_EASE_FACTOR = 2.5;
 const MIN_EASE_FACTOR = 1.3;
 
-export function useSpacedRepetition(words: Word[]) {
+export interface UseSpacedRepetitionProps {
+  difficulty?: WordDifficulty;
+}
+
+export function useSpacedRepetition({ difficulty }: UseSpacedRepetitionProps = {}) {
   const [state, setState] = useState<SpacedRepetitionState>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('nepali-word-stats');
@@ -117,11 +123,20 @@ export function useSpacedRepetition(words: Word[]) {
     return shuffled;
   };
 
-  const getNextWord = (): Word | null => {
+  // Filter words by difficulty
+  const getFilteredWords = useCallback(() => {
+    if (!difficulty) return initialWordList;
+    return initialWordList.filter(word => word.difficulty === difficulty);
+  }, [difficulty]);
+
+  const getNextWord = useCallback(() => {
+    const filteredWords = getFilteredWords();
+    if (filteredWords.length === 0) return null;
+
     const now = new Date();
     
     // Get words that are due for review
-    const dueWords = words.filter(word => {
+    const dueWords = filteredWords.filter(word => {
       const nextReview = state.nextReviewDate.get(word.id);
       return !nextReview || nextReview <= now;
     });
@@ -154,7 +169,7 @@ export function useSpacedRepetition(words: Word[]) {
     // Final shuffle and random selection
     const shuffledCandidates = shuffleArray(candidateWords);
     return shuffledCandidates[Math.floor(Math.random() * shuffledCandidates.length)];
-  };
+  }, [state, getFilteredWords, shuffleArray]);
 
   return {
     updateWordStats,

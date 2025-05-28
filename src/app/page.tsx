@@ -1,13 +1,13 @@
 "use client";
 
-import type { Word } from "@/types"; 
-import { initialWordList } from "@/data/words";
+import type { Word, WordDifficulty } from "@/types"; 
+import { initialWordList } from "../data/words";
 import { 
   EnhancedWordDisplayCard,
   EnhancedAssessmentControls,
-  EnhancedStatsCard,
-  EnhancedTimerSelector
+  EnhancedStatsCard
 } from "@/components/enhanced";
+import TimerSelector from "@/components/enhanced/TimerSelector";
 import { WordMasterErrorBoundary } from "@/components/app/WordMasterErrorBoundary";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -28,18 +28,18 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
-const TIMER_OPTIONS = [5, 8, 10, 15];
-
 interface SessionData {
   totalKnown: number;
   totalUnknown: number;
   shownWordIds: number[];
+  difficulty?: WordDifficulty;
+  timerDuration?: number;
 }
 
 export default function NepaliWordMasterPage() {
-  const [allWords, setAllWords] = useState<Word[]>(() => initialWordList.map(w => ({...w}))); 
+  const [selectedDifficulty, setSelectedDifficulty] = useState<WordDifficulty>('medium');
+  const [selectedTimerDuration, setSelectedTimerDuration] = useState<number>(10);
   const [currentWord, setCurrentWord] = useState<Word | null>(null);
-  const [selectedTimerDuration, setSelectedTimerDuration] = useState<number>(TIMER_OPTIONS[1]); 
   const [timeLeft, setTimeLeft] = useState<number>(selectedTimerDuration);
   const [isTimerRunning, setIsTimerRunning] = useState<boolean>(false);
   const [meaningsVisible, setMeaningsVisible] = useState<boolean>(false);
@@ -52,7 +52,12 @@ export default function NepaliWordMasterPage() {
 
   const { toast } = useToast();
   const { sessionData, updateSessionData, clearSessionData } = useSessionPersistence();
-  const { updateWordStats, getNextWord, wordStats } = useSpacedRepetition(allWords);
+  const { updateWordStats, getNextWord, wordStats } = useSpacedRepetition({ difficulty: selectedDifficulty });
+
+  // Get filtered words by difficulty
+  const filteredWords = useMemo(() => {
+    return initialWordList.filter((word: Word) => word.difficulty === selectedDifficulty);
+  }, [selectedDifficulty]);
 
   // Prevent hydration errors by only rendering with client data after mount
   useEffect(() => {
@@ -68,7 +73,7 @@ export default function NepaliWordMasterPage() {
     const nextWord = getNextWord();
   
     if (!nextWord) {
-      toast({ title: "Session Complete!", description: "You've reviewed all available words." });
+      toast({ title: "Session Complete!", description: "You've reviewed all available words for this difficulty." });
       setIsTimerRunning(false);
       setSessionStarted(false);
       setIsLoadingWord(false);
@@ -103,9 +108,15 @@ export default function NepaliWordMasterPage() {
     return () => clearTimeout(timerId);
   }, [isTimerRunning, timeLeft]);
 
-  const handleStartSession = () => {
+  const handleStartSession = (timerMinutes: number, difficulty: WordDifficulty) => {
+    setSelectedTimerDuration(timerMinutes);
+    setSelectedDifficulty(difficulty);
     setSessionStarted(true);
     clearSessionData();
+    updateSessionData({
+      difficulty,
+      timerDuration: timerMinutes
+    } as Partial<SessionData>);
     setCurrentWord(null); 
     selectNextWord();
   };
@@ -149,9 +160,9 @@ export default function NepaliWordMasterPage() {
   };
 
   const progressPercentage = useMemo(() => {
-    if (!isClientMounted || allWords.length === 0) return 0;
-    return ((sessionData?.shownWordIds?.length || 0) / allWords.length) * 100;
-  }, [isClientMounted, sessionData?.shownWordIds?.length, allWords.length]);
+    if (!isClientMounted || filteredWords.length === 0) return 0;
+    return ((sessionData?.shownWordIds?.length || 0) / filteredWords.length) * 100;
+  }, [isClientMounted, sessionData?.shownWordIds?.length, filteredWords.length]);
 
   // Keyboard navigation
   useEffect(() => {
@@ -199,19 +210,9 @@ export default function NepaliWordMasterPage() {
               Jhole Nepali Shabda
               </DialogTitle>
             </DialogHeader>
-            <div className="flex flex-col items-center space-y-6 w-full">
-              <EnhancedTimerSelector
-                selectedDuration={selectedTimerDuration}
-                onDurationChange={handleTimerDurationChange}
-              />
-              <Button 
-                size="lg" 
-                onClick={handleStartSession} 
-                className="w-full bg-gradient-to-r from-yellow-500 to-orange-700 hover:from-yellow-600 hover:to-orange-800 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
-              >
-                <Play className="mr-2 h-5 w-5" /> Start Guessing
-              </Button>
-            </div>
+            <TimerSelector
+              onStartGame={handleStartSession}
+            />
           </DialogContentNoClose>
         </Dialog>
 
@@ -246,7 +247,7 @@ export default function NepaliWordMasterPage() {
               <EnhancedStatsCard
                 sessionData={isClientMounted ? (sessionData || { totalKnown: 0, totalUnknown: 0, shownWordIds: [] }) : { totalKnown: 0, totalUnknown: 0, shownWordIds: [] }}
                 progressPercentage={isClientMounted ? progressPercentage : 0}
-                allWordsLength={allWords.length}
+                allWordsLength={filteredWords.length}
               />
             </div>
             <div className="flex flex-col gap-2 w-full sm:w-auto">
@@ -261,6 +262,24 @@ export default function NepaliWordMasterPage() {
           </div>
         </div>
       </main>
+
+      {/* End Session Confirmation Dialog */}
+      <AlertDialog open={showEndSessionConfirm} onOpenChange={setShowEndSessionConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>End Current Session?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to end your current learning session? Your progress will be saved, but you'll return to the main menu.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Continue Learning</AlertDialogCancel>
+            <AlertDialogAction onClick={handleEndSession}>
+              End Session
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </WordMasterErrorBoundary>
   );
 }
