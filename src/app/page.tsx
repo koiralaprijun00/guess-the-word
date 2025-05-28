@@ -52,7 +52,7 @@ export default function NepaliWordMasterPage() {
 
   const { toast } = useToast();
   const { sessionData, updateSessionData, clearSessionData, resetSessionData } = useSessionPersistence();
-  const { updateWordStats, getNextWord, wordStats } = useSpacedRepetition({ difficulty: selectedDifficulty });
+  const { updateWordStats, resetWordStats, getNextWord, wordStats } = useSpacedRepetition({ difficulty: selectedDifficulty });
 
   // Get filtered words by difficulty
   const filteredWords = useMemo(() => {
@@ -204,6 +204,18 @@ export default function NepaliWordMasterPage() {
   const handleEndSession = () => {
     setShowEndSessionConfirm(false);
     setSessionStarted(false);
+    
+    // Reset all session data and progress
+    resetSessionData({});
+    resetWordStats(); // Reset spaced repetition progress
+    
+    // Reset current word state
+    setCurrentWord(null);
+    setMeaningsVisible(false);
+    setAssessmentDone(true);
+    setEarlyAssessmentMade(false);
+    setIsTimerRunning(false);
+    setTimeLeft(selectedTimerDuration);
   };
 
   return (
@@ -279,7 +291,7 @@ export default function NepaliWordMasterPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>End Current Session?</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to end your current learning session? Your progress will be saved, but you'll return to the main menu.
+              Are you sure you want to end your current learning session? This will reset all progress and statistics, giving you a completely fresh start for your next session.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

@@ -114,6 +114,16 @@ export function useSpacedRepetition({ difficulty }: UseSpacedRepetitionProps = {
     });
   };
 
+  const resetWordStats = () => {
+    setState({
+      wordStats: new Map(),
+      nextReviewDate: new Map()
+    });
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('nepali-word-stats');
+    }
+  };
+
   const shuffleArray = <T,>(array: T[]): T[] => {
     const shuffled = [...array];
     for (let i = shuffled.length - 1; i > 0; i--) {
@@ -173,6 +183,7 @@ export function useSpacedRepetition({ difficulty }: UseSpacedRepetitionProps = {
 
   return {
     updateWordStats,
+    resetWordStats,
     getNextWord,
     wordStats: state.wordStats
   };
