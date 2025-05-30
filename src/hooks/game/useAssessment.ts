@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 import { useGameState } from '@/components/game/GameStateProvider';
 import { useSpacedRepetition } from '@/hooks/use-spaced-repetition';
 import { useWordSelection } from './useWordSelection';
@@ -9,22 +9,27 @@ export const useEarlyAssessment = () => {
   const { state, actions, sessionData, updateSessionData } = useGameState();
   const { updateWordStats } = useSpacedRepetition({ difficulty: state.difficulty });
   const selectNextWord = useWordSelection();
+  const busyRef = useRef(false); // Prevent rapid clicking
 
   return useCallback((knewIt: boolean) => {
-    if (!state.currentWord) return;
+    if (!state.currentWord || busyRef.current) return;
     
+    busyRef.current = true;
     actions.makeEarlyAssessment(knewIt);
     
     // If they knew it early, we can skip to next word after showing meaning briefly
     if (knewIt) {
       // For early assessment that auto-proceeds, we need to update the session data immediately
       setTimeout(() => {
-        if (!state.currentWord) return;
+        if (!state.currentWord) {
+          busyRef.current = false;
+          return;
+        }
         
         // Update learning algorithm
         updateWordStats(state.currentWord.id, true);
         
-        // Update session stats - ensure word is in shownWordIds and update scores
+        // ALWAYS add word to shownWordIds regardless of answer
         const currentShownIds = sessionData?.shownWordIds || [];
         const wordId = state.currentWord.id;
         
@@ -53,8 +58,11 @@ export const useEarlyAssessment = () => {
         // Auto-proceed to next word
         setTimeout(() => {
           selectNextWord();
+          busyRef.current = false; // Reset busy state
         }, 1000);
       }, 2000);
+    } else {
+      busyRef.current = false; // Reset if not auto-proceeding
     }
   }, [state.currentWord, actions, updateWordStats, updateSessionData, sessionData, selectNextWord]);
 };
@@ -63,14 +71,17 @@ export const useFinalAssessment = () => {
   const { state, actions, sessionData, updateSessionData } = useGameState();
   const { updateWordStats } = useSpacedRepetition({ difficulty: state.difficulty });
   const selectNextWord = useWordSelection();
+  const busyRef = useRef(false); // Prevent rapid clicking
 
   return useCallback((knewIt: boolean) => {
-    if (!state.currentWord) return;
+    if (!state.currentWord || busyRef.current) return;
+
+    busyRef.current = true;
 
     // Update learning algorithm
     updateWordStats(state.currentWord.id, knewIt);
     
-    // Update session stats - ensure word is in shownWordIds and update scores
+    // ALWAYS add word to shownWordIds regardless of answer
     const currentShownIds = sessionData?.shownWordIds || [];
     const wordId = state.currentWord.id;
     
@@ -101,6 +112,7 @@ export const useFinalAssessment = () => {
     // Auto-proceed to next word after a short delay
     setTimeout(() => {
       selectNextWord();
+      busyRef.current = false; // Reset busy state
     }, 1000);
   }, [
     state.currentWord, 

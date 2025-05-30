@@ -18,19 +18,26 @@ export const ProgressSection: React.FC = () => {
 
   const progressPercentage = useMemo(() => {
     if (!state.isClientMounted || filteredWords.length === 0) return 0;
-    const percentage = ((sessionData?.shownWordIds?.length || 0) / filteredWords.length) * 100;
     
-    // Debug logging
+    const shownCount = sessionData?.shownWordIds?.length || 0;
+    const totalCount = filteredWords.length;
+    const percentage = (shownCount / totalCount) * 100;
+    
+    // Enhanced debug logging to identify 16/20 issue
     console.log('Progress Debug:', {
       isClientMounted: state.isClientMounted,
-      shownWordsCount: sessionData?.shownWordIds?.length || 0,
-      totalWords: filteredWords.length,
+      difficulty: state.difficulty,
+      shownWordsCount: shownCount,
+      totalFilteredWords: totalCount,
+      fullWordListSize: initialWordList.length,
       percentage,
-      sessionData: sessionData
+      shownWordIds: sessionData?.shownWordIds || [],
+      sessionData: sessionData,
+      filteredWordsIds: filteredWords.map(w => w.id)
     });
     
     return percentage;
-  }, [state.isClientMounted, sessionData?.shownWordIds?.length, filteredWords.length, sessionData]);
+  }, [state.isClientMounted, sessionData?.shownWordIds?.length, filteredWords.length, sessionData, state.difficulty, filteredWords]);
 
   const handleEndSession = () => {
     // Reset all session data and progress

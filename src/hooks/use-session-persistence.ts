@@ -16,13 +16,26 @@ export function useSessionPersistence() {
     return null;
   });
 
+  // Move persistence out of click handlers to prevent hanging
   useEffect(() => {
-    if (sessionData) {
-      localStorage.setItem('nepali-word-session', JSON.stringify(sessionData));
+    if (sessionData && typeof window !== 'undefined') {
+      const persistData = () => {
+        localStorage.setItem('nepali-word-session', JSON.stringify(sessionData));
+      };
+
+      // Use requestIdleCallback if available, otherwise setTimeout
+      if ('requestIdleCallback' in window) {
+        const handle = window.requestIdleCallback(persistData);
+        return () => window.cancelIdleCallback(handle);
+      } else {
+        const handle = setTimeout(persistData, 16); // ~1 frame delay
+        return () => clearTimeout(handle);
+      }
     }
   }, [sessionData]);
 
   const updateSessionData = (newData: Partial<SessionData>) => {
+    // Fast state update - no blocking localStorage write
     setSessionData(prev => {
       if (!prev) {
         return {
@@ -43,7 +56,9 @@ export function useSessionPersistence() {
 
   const clearSessionData = () => {
     setSessionData(null);
-    localStorage.removeItem('nepali-word-session');
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('nepali-word-session');
+    }
   };
 
   const resetSessionData = (initialData?: Partial<SessionData>) => {
@@ -55,7 +70,10 @@ export function useSessionPersistence() {
       ...initialData
     };
     setSessionData(newSessionData);
-    localStorage.setItem('nepali-word-session', JSON.stringify(newSessionData));
+    // Immediate persistence for reset operations
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('nepali-word-session', JSON.stringify(newSessionData));
+    }
   };
 
   return {
