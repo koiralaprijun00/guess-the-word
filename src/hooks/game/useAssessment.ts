@@ -3,13 +3,11 @@
 import { useCallback } from 'react';
 import { useGameState } from '@/components/game/GameStateProvider';
 import { useSpacedRepetition } from '@/hooks/use-spaced-repetition';
-import { useSessionPersistence } from '@/hooks/use-session-persistence';
 import { useWordSelection } from './useWordSelection';
 
 export const useEarlyAssessment = () => {
-  const { state, actions } = useGameState();
+  const { state, actions, sessionData, updateSessionData } = useGameState();
   const { updateWordStats } = useSpacedRepetition({ difficulty: state.difficulty });
-  const { updateSessionData, sessionData } = useSessionPersistence();
   const selectNextWord = useWordSelection();
 
   return useCallback((knewIt: boolean) => {
@@ -62,9 +60,8 @@ export const useEarlyAssessment = () => {
 };
 
 export const useFinalAssessment = () => {
-  const { state, actions } = useGameState();
+  const { state, actions, sessionData, updateSessionData } = useGameState();
   const { updateWordStats } = useSpacedRepetition({ difficulty: state.difficulty });
-  const { updateSessionData, sessionData } = useSessionPersistence();
   const selectNextWord = useWordSelection();
 
   return useCallback((knewIt: boolean) => {

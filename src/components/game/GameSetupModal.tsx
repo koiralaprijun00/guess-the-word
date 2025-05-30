@@ -2,15 +2,13 @@
 
 import React from 'react';
 import { useGameState } from './GameStateProvider';
-import { useSessionPersistence } from '@/hooks/use-session-persistence';
 import { useWordSelection } from '@/hooks/game/useWordSelection';
 import TimerSelector from '@/components/enhanced/TimerSelector';
 import { Dialog, DialogContentNoClose, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import type { WordDifficulty } from '@/types';
 
 export const GameSetupModal: React.FC = () => {
-  const { state, actions } = useGameState();
-  const { resetSessionData } = useSessionPersistence();
+  const { state, actions, resetSessionData } = useGameState();
   const selectNextWord = useWordSelection();
 
   const handleStartSession = (timerDuration: number, difficulty: WordDifficulty) => {

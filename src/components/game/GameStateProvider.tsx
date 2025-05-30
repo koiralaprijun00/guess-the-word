@@ -3,10 +3,21 @@
 import React, { createContext, useContext, useReducer, useMemo, useEffect } from 'react';
 import type { GameState, GameActions } from '@/types/game';
 import { gameReducer, initialGameState } from '@/reducers/gameReducer';
+import { useSessionPersistence } from '@/hooks/use-session-persistence';
+
+interface SessionData {
+  shownWordIds: number[];
+  totalKnown: number;
+  totalUnknown: number;
+  lastSessionDate: string;
+}
 
 interface GameStateContextValue {
   state: GameState;
   actions: GameActions;
+  sessionData: SessionData | null;
+  updateSessionData: (newData: Partial<SessionData>) => void;
+  resetSessionData: (initialData?: Partial<SessionData>) => void;
 }
 
 const GameStateContext = createContext<GameStateContextValue | undefined>(undefined);
@@ -25,6 +36,9 @@ interface GameStateProviderProps {
 
 export const GameStateProvider: React.FC<GameStateProviderProps> = ({ children }) => {
   const [state, dispatch] = useReducer(gameReducer, initialGameState);
+  
+  // Centralize session persistence - single source of truth
+  const { sessionData, updateSessionData, resetSessionData } = useSessionPersistence();
 
   const actions = useMemo<GameActions>(() => ({
     startSession: (duration: number, difficulty) => {
@@ -76,7 +90,10 @@ export const GameStateProvider: React.FC<GameStateProviderProps> = ({ children }
   const contextValue = useMemo(() => ({
     state,
     actions,
-  }), [state, actions]);
+    sessionData,
+    updateSessionData,
+    resetSessionData,
+  }), [state, actions, sessionData, updateSessionData, resetSessionData]);
 
   return (
     <GameStateContext.Provider value={contextValue}>

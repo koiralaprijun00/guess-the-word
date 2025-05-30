@@ -3,7 +3,6 @@
 import React from 'react';
 import { useGameState } from './GameStateProvider';
 import { useSpacedRepetition } from '@/hooks/use-spaced-repetition';
-import { useSessionPersistence } from '@/hooks/use-session-persistence';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,9 +15,8 @@ import {
 } from "@/components/ui/alert-dialog";
 
 export const SessionEndDialog: React.FC = () => {
-  const { state, actions } = useGameState();
+  const { state, actions, resetSessionData } = useGameState();
   const { resetWordStats } = useSpacedRepetition({ difficulty: state.difficulty });
-  const { resetSessionData } = useSessionPersistence();
 
   const handleEndSession = () => {
     actions.showEndSessionConfirm(false);

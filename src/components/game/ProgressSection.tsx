@@ -2,15 +2,13 @@
 
 import React, { useMemo } from 'react';
 import { useGameState } from './GameStateProvider';
-import { useSessionPersistence } from '@/hooks/use-session-persistence';
 import { useSpacedRepetition } from '@/hooks/use-spaced-repetition';
 import { EnhancedStatsCard } from '@/components/enhanced';
 import { Button } from '@/components/ui/button';
 import { initialWordList } from '@/data/words';
 
 export const ProgressSection: React.FC = () => {
-  const { state, actions } = useGameState();
-  const { sessionData } = useSessionPersistence();
+  const { state, actions, sessionData } = useGameState(); // Get sessionData from centralized context
   const { resetWordStats } = useSpacedRepetition({ difficulty: state.difficulty });
 
   // Get filtered words by difficulty

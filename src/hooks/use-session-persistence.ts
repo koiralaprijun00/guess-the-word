@@ -46,7 +46,7 @@ export function useSessionPersistence() {
     localStorage.removeItem('nepali-word-session');
   };
 
-  const resetSessionData = (initialData: Partial<SessionData>) => {
+  const resetSessionData = (initialData?: Partial<SessionData>) => {
     const newSessionData = {
       shownWordIds: [],
       totalKnown: 0,
