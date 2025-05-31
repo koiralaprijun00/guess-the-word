@@ -4,7 +4,7 @@ import React from 'react';
 import { useGameState } from './GameStateProvider';
 import { /* useEarlyAssessment, */ useFinalAssessment } from '@/hooks/game/useAssessment';
 import { EnhancedWordDisplayCard } from '@/components/enhanced';
-import { WordProgressBar } from '@/components/game';
+import { ProgressAndControlsSection } from '@/components/game'; // Changed import
 
 export const WordDisplaySection: React.FC = () => {
   const { state } = useGameState();
@@ -25,7 +25,7 @@ export const WordDisplaySection: React.FC = () => {
         onFinalAssessment={finalAssessment}
         showFinalAssessment={state.meaningsVisible && !state.assessmentDone}
       />
-      <WordProgressBar />
+      <ProgressAndControlsSection />
     </div>
   );
 }; 
