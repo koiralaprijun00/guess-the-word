@@ -60,11 +60,11 @@ export function useSpacedRepetition({ difficulty }: UseSpacedRepetitionProps = {
     }
   }, [state]);
 
-  const calculateNextReview = (stats: WordStats, difficulty: number): WordStats => {
+  const calculateNextReview = (stats: WordStats, difficultyScore: number): WordStats => {
     // SM-2 algorithm implementation
     const newEaseFactor = Math.max(
       MIN_EASE_FACTOR,
-      stats.easeFactor + (0.1 - (5 - difficulty) * (0.08 + (5 - difficulty) * 0.02))
+      stats.easeFactor + (0.1 - (5 - difficultyScore) * (0.08 + (5 - difficultyScore) * 0.02))
     );
     
     let newInterval;
@@ -95,8 +95,8 @@ export function useSpacedRepetition({ difficulty }: UseSpacedRepetitionProps = {
         interval: 1
       };
 
-      const difficulty = knewIt ? 5 : 1; // 5 for knew it, 1 for didn't know
-      const newStats = calculateNextReview(currentStats, difficulty);
+      const difficultyScore = knewIt ? 5 : 1; // 5 for knew it, 1 for didn't know
+      const newStats = calculateNextReview(currentStats, difficultyScore);
       
       if (knewIt) {
         newStats.correctCount++;
@@ -135,29 +135,45 @@ export function useSpacedRepetition({ difficulty }: UseSpacedRepetitionProps = {
 
   // Filter words by difficulty
   const getFilteredWords = useCallback(() => {
-    if (!difficulty) return initialWordList;
-    return initialWordList.filter(word => word.difficulty === difficulty);
+    console.log('[SR] getFilteredWords called. Difficulty:', difficulty);
+    if (!difficulty) {
+      console.log('[SR] No difficulty set, returning all words. Count:', initialWordList.length);
+      return initialWordList;
+    }
+    const words = initialWordList.filter(word => word.difficulty === difficulty);
+    console.log('[SR] Filtered words by difficulty ', difficulty, '. Count:', words.length, 'IDs:', words.map(w => w.id));
+    return words;
   }, [difficulty]);
 
   const getNextWord = useCallback(() => {
+    console.log('[SR] getNextWord called. Current SR state:', state);
     const filteredWords = getFilteredWords();
-    if (filteredWords.length === 0) return null;
+    if (filteredWords.length === 0) {
+      console.log('[SR] No filtered words available. Returning null.');
+      return null;
+    }
 
     const now = new Date();
     
     // Get words that are due for review
     const dueWords = filteredWords.filter(word => {
       const nextReview = state.nextReviewDate.get(word.id);
-      return !nextReview || nextReview <= now;
+      const isDue = !nextReview || nextReview <= now;
+      console.log(`[SR] Due Check - Word ID: ${word.id}, Next Review: ${nextReview ? nextReview.toISOString() : 'N/A'}, Now: ${now.toISOString()}, Is Due: ${isDue}`);
+      return isDue;
     });
+    console.log('[SR] Due words for review. Count:', dueWords.length, 'IDs:', dueWords.map(w => w.id));
+
 
     if (dueWords.length === 0) {
+      console.log('[SR] No words are due for review. Returning null (potential end of session).');
       return null;
     }
 
     // Separate words into categories for better selection
     const newWords = dueWords.filter(word => !state.wordStats.has(word.id));
     const reviewWords = dueWords.filter(word => state.wordStats.has(word.id));
+    console.log('[SR] New words count:', newWords.length, 'Review words count:', reviewWords.length);
 
     // Prioritize review words, but include new words
     let candidateWords: Word[];
@@ -171,14 +187,18 @@ export function useSpacedRepetition({ difficulty }: UseSpacedRepetitionProps = {
         ...shuffleArray(reviewWords).slice(0, reviewCount),
         ...shuffleArray(newWords).slice(0, newCount)
       ];
+      console.log('[SR] Mixed candidates. Review count:', reviewCount, 'New count:', newCount, 'Total candidates:', candidateWords.length);
     } else {
       // Use all available words if only one category exists
       candidateWords = dueWords;
+      console.log('[SR] Using all due words as candidates. Count:', candidateWords.length);
     }
 
     // Final shuffle and random selection
     const shuffledCandidates = shuffleArray(candidateWords);
-    return shuffledCandidates[Math.floor(Math.random() * shuffledCandidates.length)];
+    const nextWord = shuffledCandidates[Math.floor(Math.random() * shuffledCandidates.length)];
+    console.log('[SR] Selected next word:', nextWord ? nextWord.id : 'null');
+    return nextWord;
   }, [state, getFilteredWords, shuffleArray]);
 
   return {

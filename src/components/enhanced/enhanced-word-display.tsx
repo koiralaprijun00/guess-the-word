@@ -6,6 +6,7 @@ import { WordDisplay } from './WordDisplay';
 import { EarlyAssessmentButtons } from './EarlyAssessmentButtons';
 import { WordMeaning } from './WordMeaning';
 import { LoadingWordCard } from './LoadingWordCard';
+import { FinalAssessmentButtons } from './FinalAssessmentButtons';
 
 interface WordDisplayCardProps {
   word: {
@@ -33,7 +34,7 @@ export const EnhancedWordDisplayCard: React.FC<WordDisplayCardProps> = ({
   isLoadingWord,
   onEarlyAssessment,
   onFinalAssessment,
-  showEarlyAssessment = true,
+  showEarlyAssessment = false,
   showFinalAssessment = true
 }) => {
   const [showCard, setShowCard] = useState(false);
@@ -73,7 +74,7 @@ export const EnhancedWordDisplayCard: React.FC<WordDisplayCardProps> = ({
     setTimeout(() => {
       onFinalAssessment?.(knewIt);
       setSelectedFinalAnswer(null);
-    }, 300);
+    }, 50);
   };
 
   const urgencyLevel = timeLeft <= 3 ? 'urgent' : timeLeft <= 7 ? 'warning' : 'normal';
@@ -127,13 +128,16 @@ export const EnhancedWordDisplayCard: React.FC<WordDisplayCardProps> = ({
                 meaning_nepali: word.meaning_nepali,
                 meaning_english: word.meaning_english
               }}
-              onFinalAssessment={handleFinalAssessment}
-              selectedFinalAnswer={selectedFinalAnswer}
-              showFinalAssessment={showFinalAssessment}
             />
           </CardContent>
         </Card>
       </div>
+      {/* Final Assessment Buttons - Rendered outside and below the flipping card */}
+      <FinalAssessmentButtons 
+        onFinalAssessment={onFinalAssessment} 
+        selectedFinalAnswer={selectedFinalAnswer} 
+        showFinalAssessment={meaningsVisible && showFinalAssessment} 
+      />
     </div>
   );
 }; 

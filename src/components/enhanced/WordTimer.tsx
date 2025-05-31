@@ -20,7 +20,7 @@ export const WordTimer: React.FC<WordTimerProps> = ({
   if (meaningsVisible) return null;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 -mx-4 px-4">
       <div className="relative">
         <Progress 
           value={timerProgress} 

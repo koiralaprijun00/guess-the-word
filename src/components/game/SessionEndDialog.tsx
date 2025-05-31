@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { useGameState } from './GameStateProvider';
-import { useSpacedRepetition } from '@/hooks/use-spaced-repetition';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,17 +14,14 @@ import {
 } from "@/components/ui/alert-dialog";
 
 export const SessionEndDialog: React.FC = () => {
-  const { state, actions, resetSessionData } = useGameState();
-  const { resetWordStats } = useSpacedRepetition({ difficulty: state.difficulty });
+  const { state, actions, resetSessionData, srSystem } = useGameState();
 
   const handleEndSession = () => {
     actions.showEndSessionConfirm(false);
     
-    // Reset all session data and progress
     resetSessionData({});
-    resetWordStats(); // Reset spaced repetition progress
+    srSystem.resetWordStats();
     
-    // End the session
     actions.endSession();
   };
 
@@ -34,13 +30,13 @@ export const SessionEndDialog: React.FC = () => {
       open={state.showEndSessionConfirm} 
       onOpenChange={(open) => actions.showEndSessionConfirm(open)}
     >
-      <AlertDialogContent>
+      <AlertDialogContent aria-describedby="session-end-description">
         <AlertDialogHeader>
           <AlertDialogTitle>End Current Session?</AlertDialogTitle>
-          <AlertDialogDescription>
-            Are you sure you want to end your current learning session? This will reset all progress and statistics, giving you a completely fresh start for your next session.
-          </AlertDialogDescription>
         </AlertDialogHeader>
+        <AlertDialogDescription id="session-end-description">
+          Are you sure you want to end your current learning session? This will reset all progress and statistics, giving you a completely fresh start for your next session.
+        </AlertDialogDescription>
         <AlertDialogFooter>
           <AlertDialogCancel>Continue Learning</AlertDialogCancel>
           <AlertDialogAction onClick={handleEndSession}>

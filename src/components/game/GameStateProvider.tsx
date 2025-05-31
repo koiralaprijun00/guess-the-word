@@ -4,6 +4,7 @@ import React, { createContext, useContext, useReducer, useMemo, useEffect } from
 import type { GameState, GameActions } from '@/types/game';
 import { gameReducer, initialGameState } from '@/reducers/gameReducer';
 import { useSessionPersistence } from '@/hooks/use-session-persistence';
+import { useSpacedRepetition } from '@/hooks/use-spaced-repetition';
 
 interface SessionData {
   shownWordIds: number[];
@@ -12,12 +13,15 @@ interface SessionData {
   lastSessionDate: string;
 }
 
+export type SpacedRepetitionSystem = ReturnType<typeof useSpacedRepetition>;
+
 interface GameStateContextValue {
   state: GameState;
   actions: GameActions;
   sessionData: SessionData | null;
   updateSessionData: (newData: Partial<SessionData>) => void;
   resetSessionData: (initialData?: Partial<SessionData>) => void;
+  srSystem: SpacedRepetitionSystem;
 }
 
 const GameStateContext = createContext<GameStateContextValue | undefined>(undefined);
@@ -37,8 +41,9 @@ interface GameStateProviderProps {
 export const GameStateProvider: React.FC<GameStateProviderProps> = ({ children }) => {
   const [state, dispatch] = useReducer(gameReducer, initialGameState);
   
-  // Centralize session persistence - single source of truth
   const { sessionData, updateSessionData, resetSessionData } = useSessionPersistence();
+
+  const srSystem = useSpacedRepetition({ difficulty: state.difficulty });
 
   const actions = useMemo<GameActions>(() => ({
     startSession: (duration: number, difficulty) => {
@@ -82,7 +87,6 @@ export const GameStateProvider: React.FC<GameStateProviderProps> = ({ children }
     },
   }), []);
 
-  // Set client mounted on initial render
   useEffect(() => {
     actions.setClientMounted(true);
   }, [actions]);
@@ -93,7 +97,8 @@ export const GameStateProvider: React.FC<GameStateProviderProps> = ({ children }
     sessionData,
     updateSessionData,
     resetSessionData,
-  }), [state, actions, sessionData, updateSessionData, resetSessionData]);
+    srSystem,
+  }), [state, actions, sessionData, updateSessionData, resetSessionData, srSystem]);
 
   return (
     <GameStateContext.Provider value={contextValue}>

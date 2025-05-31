@@ -6,7 +6,6 @@ import { GameStateProvider } from '@/components/game/GameStateProvider';
 import { GameHeader } from '@/components/game/GameHeader';
 import { GameSetupModal } from '@/components/game/GameSetupModal';
 import { WordDisplaySection } from '@/components/game/WordDisplaySection';
-import { ProgressSection } from '@/components/game/ProgressSection';
 import { SessionEndDialog } from '@/components/game/SessionEndDialog';
 import { KeyboardNavigationHandler } from '@/components/game/KeyboardNavigationHandler';
 import { GameTimerEffect } from '@/components/game/GameTimerEffect';
@@ -30,7 +29,7 @@ export default function NepaliWordMasterPage() {
             <WordDisplaySection />
             
             {/* Progress and Controls */}
-            <ProgressSection />
+            {/* <ProgressSection /> */}
             
           </div>
           

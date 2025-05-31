@@ -22,7 +22,6 @@ export const WordDisplaySection: React.FC = () => {
         isLoadingWord={state.isLoadingWord}
         onEarlyAssessment={earlyAssessment}
         onFinalAssessment={finalAssessment}
-        showEarlyAssessment={!state.earlyAssessmentMade}
         showFinalAssessment={state.meaningsVisible && !state.assessmentDone}
       />
     </div>

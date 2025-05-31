@@ -16,26 +16,17 @@ export function useSessionPersistence() {
     return null;
   });
 
-  // Move persistence out of click handlers to prevent hanging
+  // Simplified: Direct persistence on change
   useEffect(() => {
     if (sessionData && typeof window !== 'undefined') {
-      const persistData = () => {
-        localStorage.setItem('nepali-word-session', JSON.stringify(sessionData));
-      };
-
-      // Use requestIdleCallback if available, otherwise setTimeout
-      if ('requestIdleCallback' in window) {
-        const handle = window.requestIdleCallback(persistData);
-        return () => window.cancelIdleCallback(handle);
-      } else {
-        const handle = setTimeout(persistData, 16); // ~1 frame delay
-        return () => clearTimeout(handle);
-      }
+      localStorage.setItem('nepali-word-session', JSON.stringify(sessionData));
+    } else if (!sessionData && typeof window !== 'undefined') {
+      // Clear localStorage if sessionData is null (e.g., after clearSessionData)
+      localStorage.removeItem('nepali-word-session');
     }
   }, [sessionData]);
 
   const updateSessionData = (newData: Partial<SessionData>) => {
-    // Fast state update - no blocking localStorage write
     setSessionData(prev => {
       if (!prev) {
         return {
@@ -56,9 +47,7 @@ export function useSessionPersistence() {
 
   const clearSessionData = () => {
     setSessionData(null);
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('nepali-word-session');
-    }
+    // localStorage will be cleared by the useEffect
   };
 
   const resetSessionData = (initialData?: Partial<SessionData>) => {
@@ -70,10 +59,7 @@ export function useSessionPersistence() {
       ...initialData
     };
     setSessionData(newSessionData);
-    // Immediate persistence for reset operations
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('nepali-word-session', JSON.stringify(newSessionData));
-    }
+    // localStorage will be updated by the useEffect
   };
 
   return {

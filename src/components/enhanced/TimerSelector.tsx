@@ -11,8 +11,8 @@ interface TimerSelectorProps {
 const TIMER_OPTIONS = [
   { value: 5, label: '5 सेकेन्ड' },
   { value: 10, label: '10 सेकेन्ड' },
-  { value: 15, label: '15 सेकेन्ड' },
-  { value: 20, label: '20 सेकेन्ड' }
+  // { value: 15, label: '15 सेकेन्ड' },
+  // { value: 20, label: '20 सेकेन्ड' }
 ];
 
 const DIFFICULTY_OPTIONS = [

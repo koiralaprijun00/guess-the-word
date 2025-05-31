@@ -2,12 +2,10 @@
 
 import { useCallback, useRef } from 'react';
 import { useGameState } from '@/components/game/GameStateProvider';
-import { useSpacedRepetition } from '@/hooks/use-spaced-repetition';
 import { useWordSelection } from './useWordSelection';
 
 export const useEarlyAssessment = () => {
-  const { state, actions, sessionData, updateSessionData } = useGameState();
-  const { updateWordStats } = useSpacedRepetition({ difficulty: state.difficulty });
+  const { state, actions, sessionData, updateSessionData, srSystem } = useGameState();
   const selectNextWord = useWordSelection();
   const busyRef = useRef(false); // Prevent rapid clicking
 
@@ -17,23 +15,18 @@ export const useEarlyAssessment = () => {
     busyRef.current = true;
     actions.makeEarlyAssessment(knewIt);
     
-    // If they knew it early, we can skip to next word after showing meaning briefly
     if (knewIt) {
-      // For early assessment that auto-proceeds, we need to update the session data immediately
+      // Defer non-critical updates to keep UI responsive
       setTimeout(() => {
         if (!state.currentWord) {
           busyRef.current = false;
           return;
         }
         
-        // Update learning algorithm
-        updateWordStats(state.currentWord.id, true);
+        srSystem.updateWordStats(state.currentWord.id, true);
         
-        // ALWAYS add word to shownWordIds regardless of answer
         const currentShownIds = sessionData?.shownWordIds || [];
         const wordId = state.currentWord.id;
-        
-        // Add word to shown list if not already there
         const updatedShownIds = currentShownIds.includes(wordId) 
           ? currentShownIds 
           : [...currentShownIds, wordId];
@@ -41,51 +34,40 @@ export const useEarlyAssessment = () => {
         updateSessionData({
           shownWordIds: updatedShownIds,
           totalKnown: (sessionData?.totalKnown || 0) + 1,
-          totalUnknown: (sessionData?.totalUnknown || 0)
         });
-        
-        // Debug logging
-        console.log('Early Assessment - Session Data Update:', {
-          wordId: state.currentWord.id,
-          updatedShownIds,
-          newTotalKnown: (sessionData?.totalKnown || 0) + 1,
-          newTotalUnknown: (sessionData?.totalUnknown || 0),
-          previousSessionData: sessionData
-        });
-        
+                
         actions.finalizeAssessment(true);
         
-        // Auto-proceed to next word
         setTimeout(() => {
           selectNextWord();
-          busyRef.current = false; // Reset busy state
-        }, 1000);
-      }, 2000);
+          busyRef.current = false;
+        }, 1000); // Delay for user to see the card back
+      }, 50); // Small delay to allow UI to update before heavier logic
     } else {
-      busyRef.current = false; // Reset if not auto-proceeding
+      // If user clicks "Need to learn" (or similar, if that was an option for early), 
+      // meaning is shown, but no immediate word change or stat update here.
+      // Final assessment will handle it.
+      // We must reset busyRef if we are not proceeding via the knewIt path.
+      busyRef.current = false;
     }
-  }, [state.currentWord, actions, updateWordStats, updateSessionData, sessionData, selectNextWord]);
+  }, [state.currentWord, actions, srSystem, updateSessionData, sessionData, selectNextWord]);
 };
 
 export const useFinalAssessment = () => {
-  const { state, actions, sessionData, updateSessionData } = useGameState();
-  const { updateWordStats } = useSpacedRepetition({ difficulty: state.difficulty });
+  const { state, actions, sessionData, updateSessionData, srSystem } = useGameState();
   const selectNextWord = useWordSelection();
-  const busyRef = useRef(false); // Prevent rapid clicking
+  const busyRef = useRef(false);
 
   return useCallback((knewIt: boolean) => {
     if (!state.currentWord || busyRef.current) return;
 
     busyRef.current = true;
-
-    // Update learning algorithm
-    updateWordStats(state.currentWord.id, knewIt);
     
-    // ALWAYS add word to shownWordIds regardless of answer
+    // Perform updates immediately, then schedule next word
+    srSystem.updateWordStats(state.currentWord.id, knewIt);
+    
     const currentShownIds = sessionData?.shownWordIds || [];
     const wordId = state.currentWord.id;
-    
-    // Add word to shown list if not already there
     const updatedShownIds = currentShownIds.includes(wordId) 
       ? currentShownIds 
       : [...currentShownIds, wordId];
@@ -95,28 +77,18 @@ export const useFinalAssessment = () => {
       totalKnown: (sessionData?.totalKnown || 0) + (knewIt ? 1 : 0),
       totalUnknown: (sessionData?.totalUnknown || 0) + (knewIt ? 0 : 1)
     });
-    
-    // Debug logging
-    console.log('Final Assessment - Session Data Update:', {
-      wordId: state.currentWord.id,
-      knewIt,
-      updatedShownIds,
-      newTotalKnown: (sessionData?.totalKnown || 0) + (knewIt ? 1 : 0),
-      newTotalUnknown: (sessionData?.totalUnknown || 0) + (knewIt ? 0 : 1),
-      previousSessionData: sessionData
-    });
-    
-    // Mark assessment as done
+        
     actions.finalizeAssessment(knewIt);
     
     // Auto-proceed to next word after a short delay
     setTimeout(() => {
       selectNextWord();
-      busyRef.current = false; // Reset busy state
-    }, 1000);
+      busyRef.current = false;
+    }, 200); // Reduced delay from 1000ms to 200ms
+
   }, [
     state.currentWord, 
-    updateWordStats, 
+    srSystem,
     updateSessionData, 
     sessionData,
     actions, 
