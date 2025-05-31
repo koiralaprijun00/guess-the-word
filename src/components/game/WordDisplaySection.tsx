@@ -15,7 +15,6 @@ export const WordDisplaySection: React.FC = () => {
   
   return (
     <div className="w-full max-w-2xl space-y-4"> {/* Added space-y-4 for spacing */}
-      <WordProgressBar />
       <EnhancedWordDisplayCard
         word={state.currentWord}
         timeLeft={state.timeLeft}
@@ -26,6 +25,7 @@ export const WordDisplaySection: React.FC = () => {
         onFinalAssessment={finalAssessment}
         showFinalAssessment={state.meaningsVisible && !state.assessmentDone}
       />
+      <WordProgressBar />
     </div>
   );
 }; 
