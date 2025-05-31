@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useReducer, useMemo, useEffect } from 'react';
 import type { GameState, GameActions } from '@/types/game';
 import { gameReducer, initialGameState } from '@/reducers/gameReducer';
+import { initialWordList } from '@/data/words';
 import { useSessionPersistence } from '@/hooks/use-session-persistence';
 import { useSpacedRepetition } from '@/hooks/use-spaced-repetition';
 
@@ -48,6 +49,7 @@ export const GameStateProvider: React.FC<GameStateProviderProps> = ({ children }
   const actions = useMemo<GameActions>(() => ({
     startSession: (duration: number, difficulty) => {
       dispatch({ type: 'START_SESSION', payload: { duration, difficulty } });
+      dispatch({ type: 'SET_TOTAL_WORDS', payload: { count: initialWordList.length } });
     },
     selectNextWord: () => {
       dispatch({ type: 'SELECT_NEXT_WORD' });
@@ -69,6 +71,11 @@ export const GameStateProvider: React.FC<GameStateProviderProps> = ({ children }
     },
     finalizeAssessment: (knewIt: boolean) => {
       dispatch({ type: 'FINALIZE_ASSESSMENT', payload: { knewIt } });
+      if (knewIt) {
+        dispatch({ type: 'INCREMENT_KNOWN_WORDS' });
+      } else {
+        dispatch({ type: 'INCREMENT_UNKNOWN_WORDS' });
+      }
     },
     setClientMounted: (mounted: boolean) => {
       dispatch({ type: 'SET_CLIENT_MOUNTED', payload: { mounted } });
@@ -85,7 +92,16 @@ export const GameStateProvider: React.FC<GameStateProviderProps> = ({ children }
     resetWordState: () => {
       dispatch({ type: 'RESET_WORD_STATE' });
     },
-  }), []);
+    setTotalWords: (count: number) => {
+      dispatch({ type: 'SET_TOTAL_WORDS', payload: { count } });
+    },
+    incrementKnownWords: () => {
+      dispatch({ type: 'INCREMENT_KNOWN_WORDS' });
+    },
+    incrementUnknownWords: () => {
+      dispatch({ type: 'INCREMENT_UNKNOWN_WORDS' });
+    },
+  }), [dispatch]); // Added dispatch to dependency array
 
   useEffect(() => {
     actions.setClientMounted(true);
