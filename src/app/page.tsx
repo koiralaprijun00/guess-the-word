@@ -28,9 +28,6 @@ export default function NepaliWordMasterPage() {
             {/* Word Display Section */}
             <WordDisplaySection />
             
-            {/* Progress and Controls */}
-            {/* <ProgressSection /> */}
-            
           </div>
           
           {/* Session End Confirmation */}

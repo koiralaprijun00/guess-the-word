@@ -7,3 +7,4 @@ export * from './KeyboardNavigationHandler';
 export * from './SessionEndDialog';
 export * from './WordDisplaySection';
 export * from './ProgressBar'; // Changed from WordProgressBar to ProgressBar to match filename
+export * from './ProgressAndControlsSection';

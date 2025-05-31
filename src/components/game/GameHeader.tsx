@@ -2,34 +2,12 @@
 
 "use client";
 
-import React, { useState } from 'react'; // Added useState
-import { Clock, XCircle } from 'lucide-react'; // Added XCircle for the button icon
+import React from 'react';
+import { Clock } from 'lucide-react';
 import { useGameState } from './GameStateProvider';
-import { Button } from '@/components/ui/button'; // Ensure this path is correct
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"; // Added AlertDialog components
 
 export const GameHeader: React.FC = () => {
-  const { state, actions } = useGameState(); // Destructure actions
-  const [showConfirmDialog, setShowConfirmDialog] = useState<boolean>(false); // Added showConfirmDialog state
-
-  const handleEndGame = () => {
-    setShowConfirmDialog(true); // Modified to show dialog
-  };
-
-  const confirmEndGame = () => {
-    actions.endSession();
-    setShowConfirmDialog(false);
-  };
+  const { state } = useGameState(); // Destructure actions, actions removed
 
   // Only show header content if session has started
   if (!state.sessionStarted) {
@@ -51,31 +29,7 @@ export const GameHeader: React.FC = () => {
           <span className="font-medium uppercase tracking-wide">Mode:</span>
           <span className="font-semibold capitalize">{state.difficulty}</span>
         </div>
-        <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
-          <AlertDialogTrigger asChild>
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={handleEndGame}
-              className="flex items-center gap-1.5"
-            >
-              <XCircle className="w-4 h-4" />
-              End Game
-            </Button>
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>End Game?</AlertDialogTitle>
-              <AlertDialogDescription>
-                Are you sure you want to end the current game? Your progress will be saved.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel onClick={() => setShowConfirmDialog(false)}>Cancel</AlertDialogCancel>
-              <AlertDialogAction onClick={confirmEndGame}>End Game</AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+        {/* End Game Button and AlertDialog logic has been moved to EndGameButton.tsx */}
       </div>
     </div>
   );
