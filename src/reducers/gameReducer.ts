@@ -12,7 +12,6 @@ export const initialGameState: GameState = {
   isTimerRunning: false,
   meaningsVisible: false,
   assessmentDone: true,
-  earlyAssessmentMade: false,
   
   // UI state
   isLoadingWord: false,
@@ -32,7 +31,6 @@ export const gameReducer = (state: GameState, action: GameAction): GameState => 
         currentWord: null,
         meaningsVisible: false,
         assessmentDone: true,
-        earlyAssessmentMade: false,
         isTimerRunning: false,
         isLoadingWord: false,
       };
@@ -43,7 +41,6 @@ export const gameReducer = (state: GameState, action: GameAction): GameState => 
         isLoadingWord: true,
         meaningsVisible: false,
         assessmentDone: false,
-        earlyAssessmentMade: false,
       };
       
     case 'SET_CURRENT_WORD':
@@ -76,14 +73,6 @@ export const gameReducer = (state: GameState, action: GameAction): GameState => 
     case 'SHOW_MEANINGS':
       return {
         ...state,
-        isTimerRunning: false,
-        meaningsVisible: true,
-      };
-      
-    case 'MAKE_EARLY_ASSESSMENT':
-      return {
-        ...state,
-        earlyAssessmentMade: true,
         isTimerRunning: false,
         meaningsVisible: true,
       };
@@ -124,7 +113,6 @@ export const gameReducer = (state: GameState, action: GameAction): GameState => 
         currentWord: null,
         meaningsVisible: false,
         assessmentDone: true,
-        earlyAssessmentMade: false,
         isTimerRunning: false,
         timeLeft: state.timerDuration,
       };

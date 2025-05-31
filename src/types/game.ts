@@ -12,7 +12,6 @@ export interface GameState {
   isTimerRunning: boolean;
   meaningsVisible: boolean;
   assessmentDone: boolean;
-  earlyAssessmentMade: boolean;
   
   // UI state
   isLoadingWord: boolean;

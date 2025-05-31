@@ -3,7 +3,6 @@ import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { WordTimer } from './WordTimer';
 import { WordDisplay } from './WordDisplay';
-import { EarlyAssessmentButtons } from './EarlyAssessmentButtons';
 import { WordMeaning } from './WordMeaning';
 import { LoadingWordCard } from './LoadingWordCard';
 import { FinalAssessmentButtons } from './FinalAssessmentButtons';
@@ -20,9 +19,7 @@ interface WordDisplayCardProps {
   timerDuration: number;
   meaningsVisible: boolean;
   isLoadingWord: boolean;
-  onEarlyAssessment?: (knewIt: boolean) => void;
   onFinalAssessment?: (knewIt: boolean) => void;
-  showEarlyAssessment?: boolean;
   showFinalAssessment?: boolean;
 }
 
@@ -32,23 +29,17 @@ export const EnhancedWordDisplayCard: React.FC<WordDisplayCardProps> = ({
   timerDuration,
   meaningsVisible,
   isLoadingWord,
-  onEarlyAssessment,
   onFinalAssessment,
-  showEarlyAssessment = false,
   showFinalAssessment = true
 }) => {
   const [showCard, setShowCard] = useState(false);
   const [cardFlipped, setCardFlipped] = useState(false);
-  const [earlyAssessmentMade, setEarlyAssessmentMade] = useState(false);
-  const [selectedEarlyAnswer, setSelectedEarlyAnswer] = useState<boolean | null>(null);
   const [selectedFinalAnswer, setSelectedFinalAnswer] = useState<boolean | null>(null);
   
   useEffect(() => {
     if (word && !isLoadingWord) {
       setShowCard(true);
       setCardFlipped(false);
-      setEarlyAssessmentMade(false);
-      setSelectedEarlyAnswer(null);
       setSelectedFinalAnswer(null);
     } else {
       setShowCard(false);
@@ -60,14 +51,6 @@ export const EnhancedWordDisplayCard: React.FC<WordDisplayCardProps> = ({
       setCardFlipped(true);
     }
   }, [meaningsVisible]);
-
-  const handleEarlyAssessment = (knewIt: boolean) => {
-    setSelectedEarlyAnswer(knewIt);
-    setEarlyAssessmentMade(true);
-    setTimeout(() => {
-      onEarlyAssessment?.(knewIt);
-    }, 300);
-  };
 
   const handleFinalAssessment = (knewIt: boolean) => {
     setSelectedFinalAnswer(knewIt);
@@ -105,13 +88,6 @@ export const EnhancedWordDisplayCard: React.FC<WordDisplayCardProps> = ({
               timeLeft={timeLeft}
               timerDuration={timerDuration}
               meaningsVisible={meaningsVisible}
-            />
-
-            <EarlyAssessmentButtons
-              onAssessment={handleEarlyAssessment}
-              selectedAnswer={selectedEarlyAnswer}
-              disabled={selectedEarlyAnswer !== null}
-              show={showEarlyAssessment && !meaningsVisible && !earlyAssessmentMade}
             />
           </CardContent>
         </Card>
