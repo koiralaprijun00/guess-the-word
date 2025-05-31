@@ -17,6 +17,9 @@ export interface GameState {
   isLoadingWord: boolean;
   isClientMounted: boolean;
   showEndSessionConfirm: boolean;
+  totalWords: number;
+  knownWords: number;
+  unknownWords: number;
 }
 
 export type GameAction = 
@@ -32,7 +35,10 @@ export type GameAction =
   | { type: 'SET_LOADING'; payload: { loading: boolean } }
   | { type: 'SHOW_END_SESSION_CONFIRM'; payload: { show: boolean } }
   | { type: 'END_SESSION' }
-  | { type: 'RESET_WORD_STATE' };
+  | { type: 'RESET_WORD_STATE' }
+  | { type: 'SET_TOTAL_WORDS'; payload: { count: number } }
+  | { type: 'INCREMENT_KNOWN_WORDS' }
+  | { type: 'INCREMENT_UNKNOWN_WORDS' };
 
 export interface GameActions {
   startSession: (duration: number, difficulty: WordDifficulty) => void;
@@ -48,4 +54,7 @@ export interface GameActions {
   showEndSessionConfirm: (show: boolean) => void;
   endSession: () => void;
   resetWordState: () => void;
+  setTotalWords: (count: number) => void;
+  incrementKnownWords: () => void;
+  incrementUnknownWords: () => void;
 } 

@@ -17,6 +17,9 @@ export const initialGameState: GameState = {
   isLoadingWord: false,
   isClientMounted: false,
   showEndSessionConfirm: false,
+  totalWords: 0,
+  knownWords: 0,
+  unknownWords: 0,
 };
 
 export const gameReducer = (state: GameState, action: GameAction): GameState => {
@@ -33,6 +36,8 @@ export const gameReducer = (state: GameState, action: GameAction): GameState => 
         assessmentDone: true,
         isTimerRunning: false,
         isLoadingWord: false,
+        knownWords: 0,
+        unknownWords: 0,
       };
       
     case 'SELECT_NEXT_WORD':
@@ -105,6 +110,9 @@ export const gameReducer = (state: GameState, action: GameAction): GameState => 
       return {
         ...initialGameState,
         isClientMounted: state.isClientMounted,
+        totalWords: 0,
+        knownWords: 0,
+        unknownWords: 0,
       };
       
     case 'RESET_WORD_STATE':
@@ -117,6 +125,24 @@ export const gameReducer = (state: GameState, action: GameAction): GameState => 
         timeLeft: state.timerDuration,
       };
       
+    case 'SET_TOTAL_WORDS':
+      return {
+        ...state,
+        totalWords: action.payload.count,
+      };
+
+    case 'INCREMENT_KNOWN_WORDS':
+      return {
+        ...state,
+        knownWords: state.knownWords + 1,
+      };
+
+    case 'INCREMENT_UNKNOWN_WORDS':
+      return {
+        ...state,
+        unknownWords: state.unknownWords + 1,
+      };
+
     default:
       return state;
   }
