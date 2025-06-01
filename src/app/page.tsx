@@ -2,18 +2,18 @@
 
 import React from 'react';
 // Imports from VocabGameApp.tsx (paths adjusted)
-import { GameStateProvider } from "../features/vocab-game/context"; 
-import { GameHeader } from '../features/vocab-game/components/GameHeader'; 
-import { GameSetupDialog } from '../features/vocab-game/components/GameSetupDialog'; 
-import { WordCard } from '../features/vocab-game/components/WordCard'; 
-import { EndSessionDialog } from '../features/vocab-game/components/EndSessionDialog'; 
-import { KeyboardNavigationHandler } from '../features/vocab-game/components/KeyboardNavigationHandler'; 
-import { GameTimerEffect } from '../features/vocab-game/components/GameTimerEffect'; 
-import { Toaster } from '../features/vocab-game/components/ui/toaster'; 
-import { useGameState } from '../features/vocab-game/context'; 
+import { GameStateProvider } from "../guess-the-word/context"; 
+import { GameHeader } from '../guess-the-word/components/GameHeader'; 
+import { GameSetupDialog } from '../guess-the-word/components/GameSetupDialog'; 
+import { WordCard } from '../guess-the-word/components/WordCard'; 
+import { EndSessionDialog } from '../guess-the-word/components/EndSessionDialog'; 
+import { KeyboardNavigationHandler } from '../guess-the-word/components/KeyboardNavigationHandler'; 
+import { GameTimerEffect } from '../guess-the-word/components/GameTimerEffect'; 
+import { Toaster } from '../guess-the-word/components/ui/toaster'; 
+import { useGameState } from '../guess-the-word/context'; 
 // Original imports for page.tsx
 // Removed: import { VocabGameApp } from "../features/vocab-game/VocabGameApp"; // This will be deleted
-import { WordMasterErrorBoundary } from "../features/vocab-game/components/WordMasterErrorBoundary";
+import { WordMasterErrorBoundary } from "../guess-the-word/components/WordMasterErrorBoundary";
 
 // Copied AppContent from VocabGameApp.tsx
 const AppContent: React.FC = () => {

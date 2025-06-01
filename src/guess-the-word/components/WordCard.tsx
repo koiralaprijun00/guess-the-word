@@ -3,7 +3,6 @@ import { Card, CardContent } from './ui/card';
 import { Progress } from './ui/progress';
 import { cn } from '../lib/utils';
 import { Clock } from 'lucide-react';
-import type { Word } from '../types';
 import { useGameState } from '../context';
 import { useFinalAssessment } from '../hooks';
 import { AssessmentControls } from './AssessmentControls';
