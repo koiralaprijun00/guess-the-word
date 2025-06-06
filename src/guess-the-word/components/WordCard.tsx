@@ -72,7 +72,7 @@ const WordMeaningContent: React.FC<{ wordData: { roman: string; meaning_nepali: 
 
 export const WordCard: React.FC = () => {
   const { state } = useGameState();
-  const finalAssessment = useFinalAssessment();
+  const { finalAssessment, isProcessing } = useFinalAssessment();
   const [cardFlipped, setCardFlipped] = useState(false);
 
   useEffect(() => {
@@ -129,7 +129,7 @@ export const WordCard: React.FC = () => {
       </div>
       {/* Assessment Controls - Rendered outside and below the flipping card */}
       {meaningsVisible && !assessmentDone && (
-        <AssessmentControls onAssess={finalAssessment} disabled={assessmentDone} />
+        <AssessmentControls onAssess={finalAssessment} disabled={assessmentDone || isProcessing} />
       )}
     </div>
   );

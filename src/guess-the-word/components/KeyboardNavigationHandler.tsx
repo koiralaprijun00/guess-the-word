@@ -6,7 +6,7 @@ import { useFinalAssessment, useWordSelection } from '../hooks'; // Corrected pa
 
 export const KeyboardNavigationHandler: React.FC = () => {
   const { state } = useGameState();
-  const finalAssessment = useFinalAssessment();
+  const { finalAssessment } = useFinalAssessment();
   const selectNextWord = useWordSelection();
 
   useEffect(() => {

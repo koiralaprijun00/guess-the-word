@@ -1,5 +1,5 @@
 // This file will consolidate game-specific React hooks. 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, startTransition } from 'react';
 import type { Word, WordDifficulty } from './types'; // Updated path
 import { initialWordList } from './data';
 import { useGameState } from './context'; // Corrected path
@@ -305,39 +305,48 @@ export const useFinalAssessment = () => {
   const { state, actions, sessionData, updateSessionData, srSystem } = useGameState();
   const selectNextWord = useWordSelection(); // This will now call the local hook
   const busyRef = useRef(false);
+  const [isProcessing, setIsProcessing] = useState(false);
 
-  return useCallback((knewIt: boolean) => {
-    if (!state.currentWord || busyRef.current) return;
+  const finalAssessment = useCallback(
+    (knewIt: boolean) => {
+      if (!state.currentWord || busyRef.current) return;
 
-    busyRef.current = true;
-    
-    srSystem.updateWordStats(state.currentWord.id, knewIt);
-    
-    const currentShownIds = sessionData?.shownWordIds || [];
-    const wordId = state.currentWord.id;
-    const updatedShownIds = currentShownIds.includes(wordId) 
-      ? currentShownIds 
-      : [...currentShownIds, wordId];
-    
-    updateSessionData({
-      shownWordIds: updatedShownIds,
-      totalKnown: (sessionData?.totalKnown || 0) + (knewIt ? 1 : 0),
-      totalUnknown: (sessionData?.totalUnknown || 0) + (knewIt ? 0 : 1)
-    });
-        
-    actions.finalizeAssessment(knewIt);
-    
-    setTimeout(() => {
-      selectNextWord();
-      busyRef.current = false;
-    }, 200);
+      busyRef.current = true;
+      setIsProcessing(true);
 
-  }, [
-    state.currentWord, 
-    srSystem,
-    updateSessionData, 
-    sessionData,
-    actions, 
-    selectNextWord
-  ]);
-}; 
+      srSystem.updateWordStats(state.currentWord.id, knewIt);
+
+      const currentShownIds = sessionData?.shownWordIds || [];
+      const wordId = state.currentWord.id;
+      const updatedShownIds = currentShownIds.includes(wordId)
+        ? currentShownIds
+        : [...currentShownIds, wordId];
+
+      updateSessionData({
+        shownWordIds: updatedShownIds,
+        totalKnown: (sessionData?.totalKnown || 0) + (knewIt ? 1 : 0),
+        totalUnknown: (sessionData?.totalUnknown || 0) + (knewIt ? 0 : 1)
+      });
+
+      actions.finalizeAssessment(knewIt);
+
+      setTimeout(() => {
+        startTransition(() => {
+          selectNextWord();
+        });
+        busyRef.current = false;
+        setIsProcessing(false);
+      }, 200);
+    },
+    [
+      state.currentWord,
+      srSystem,
+      updateSessionData,
+      sessionData,
+      actions,
+      selectNextWord
+    ]
+  );
+
+  return { finalAssessment, isProcessing };
+};
