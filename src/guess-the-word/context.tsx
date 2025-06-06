@@ -4,7 +4,8 @@ import React, { createContext, useContext, useReducer, useMemo, useEffect } from
 import type { GameState, GameActions } from './types';
 import { gameReducer, initialGameState } from './reducer'; // Updated path
 import { initialWordList } from './data';
-import { useSessionPersistence, useSpacedRepetition, type SpacedRepetitionSystem, type SessionData } from './hooks'; // Import SpacedRepetitionSystem and SessionData
+import { useSessionPersistence, useSpacedRepetition, type SpacedRepetitionSystem } from './hooks';
+import type { SessionData } from './types';
 
 interface GameStateContextValue {
   state: GameState;

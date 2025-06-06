@@ -4,14 +4,7 @@ import type { Word, WordDifficulty } from './types'; // Updated path
 import { initialWordList } from './data';
 import { useGameState } from './context'; // Corrected path
 import { useToast } from './hooks/use-toast'; // Corrected path to subdirectory
-
-// Note: This interface is also in context.tsx - should be consolidated.
-export interface SessionData {
-  shownWordIds: number[];
-  totalKnown: number;
-  totalUnknown: number;
-  lastSessionDate: string;
-}
+import type { SessionData } from './types';
 
 interface WordStats {
   id: number;
@@ -37,41 +30,30 @@ export interface UseSpacedRepetitionProps {
 export function useSessionPersistence() {
   const [sessionData, setSessionData] = useState<SessionData | null>(() => {
     if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('vocabGameSession'); // Updated key
+      const saved = localStorage.getItem('vocabGameSession');
       return saved ? JSON.parse(saved) : null;
     }
     return null;
   });
 
-  useEffect(() => {
-    if (sessionData && typeof window !== 'undefined') {
-      localStorage.setItem('vocabGameSession', JSON.stringify(sessionData)); // Updated key
-    } else if (!sessionData && typeof window !== 'undefined') {
-      localStorage.removeItem('vocabGameSession'); // Updated key
-    }
-  }, [sessionData]);
-
   const updateSessionData = (newData: Partial<SessionData>) => {
     setSessionData(prev => {
-      if (!prev) {
-        return {
-          shownWordIds: [],
-          totalKnown: 0,
-          totalUnknown: 0,
-          lastSessionDate: new Date().toISOString(),
-          ...newData
-        };
-      }
-      return {
-        ...prev,
-        ...newData,
-        lastSessionDate: new Date().toISOString()
-      };
-    });
-  };
+      const updated = prev
+        ? { ...prev, ...newData, lastSessionDate: new Date().toISOString() }
+        : {
+            shownWordIds: [],
+            totalKnown: 0,
+            totalUnknown: 0,
+            lastSessionDate: new Date().toISOString(),
+            ...newData,
+          };
 
-  const clearSessionData = () => {
-    setSessionData(null);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('vocabGameSession', JSON.stringify(updated));
+      }
+
+      return updated;
+    });
   };
 
   const resetSessionData = (initialData?: Partial<SessionData>) => {
@@ -80,15 +62,19 @@ export function useSessionPersistence() {
       totalKnown: 0,
       totalUnknown: 0,
       lastSessionDate: new Date().toISOString(),
-      ...initialData
+      ...initialData,
     };
+
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('vocabGameSession', JSON.stringify(newSessionData));
+    }
+
     setSessionData(newSessionData);
   };
 
   return {
     sessionData,
     updateSessionData,
-    clearSessionData,
     resetSessionData
   };
 }
@@ -117,17 +103,6 @@ export function useSpacedRepetition({ difficulty }: UseSpacedRepetitionProps = {
     };
   });
 
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const serialized = {
-        wordStats: Object.fromEntries(state.wordStats),
-        nextReviewDate: Object.fromEntries(
-          Array.from(state.nextReviewDate.entries()).map(([id, date]) => [id, date.toISOString()])
-        )
-      };
-      localStorage.setItem('vocabGameStats', JSON.stringify(serialized)); // Updated key
-    }
-  }, [state]);
 
   const calculateNextReview = (stats: WordStats, difficultyScore: number): WordStats => {
     const newEaseFactor = Math.max(
@@ -175,20 +150,36 @@ export function useSpacedRepetition({ difficulty }: UseSpacedRepetitionProps = {
       const nextReview = new Date();
       nextReview.setDate(nextReview.getDate() + newStats.interval);
 
-      return {
+      const updatedState = {
         wordStats: new Map(prev.wordStats).set(wordId, newStats),
-        nextReviewDate: new Map(prev.nextReviewDate).set(wordId, nextReview)
+        nextReviewDate: new Map(prev.nextReviewDate).set(wordId, nextReview),
       };
+
+      if (typeof window !== 'undefined') {
+        const serialized = {
+          wordStats: Object.fromEntries(updatedState.wordStats),
+          nextReviewDate: Object.fromEntries(
+            Array.from(updatedState.nextReviewDate.entries()).map(([id, date]) => [
+              id,
+              date.toISOString(),
+            ])
+          ),
+        };
+        localStorage.setItem('vocabGameStats', JSON.stringify(serialized));
+      }
+
+      return updatedState;
     });
   };
 
   const resetWordStats = () => {
-    setState({
-      wordStats: new Map(),
-      nextReviewDate: new Map()
-    });
+    const cleared = { wordStats: new Map<number, WordStats>(), nextReviewDate: new Map<number, Date>() };
+    setState(cleared);
     if (typeof window !== 'undefined') {
-      localStorage.removeItem('vocabGameStats'); // Updated key
+      localStorage.setItem(
+        'vocabGameStats',
+        JSON.stringify({ wordStats: {}, nextReviewDate: {} })
+      );
     }
   };
 
@@ -296,8 +287,6 @@ export const useGameTimer = () => {
   return {
     timeLeft: state.timeLeft,
     isRunning: state.isTimerRunning,
-    start: actions.startTimer,
-    stop: () => actions.showMeanings(), // This seems to be specific, perhaps should be a direct action if named stop
   };
 };
 
