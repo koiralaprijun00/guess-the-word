@@ -10,6 +10,13 @@ export interface Word {
   difficulty: WordDifficulty;
 }
 
+export interface SessionData {
+  shownWordIds: number[];
+  totalKnown: number;
+  totalUnknown: number;
+  lastSessionDate: string;
+}
+
 // ====== From src/types/game.ts ======
 // import type { Word, WordDifficulty } from './index'; // No longer needed as types are in the same file
 

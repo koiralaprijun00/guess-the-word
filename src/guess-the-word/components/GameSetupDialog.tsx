@@ -20,8 +20,7 @@ export const GameSetupDialog: React.FC = () => { // Renamed component
   const handleConfirmSettingsAndStart = useCallback(() => {
     gameSettingsRef.current = { timerDuration: selectedTimer, difficulty: selectedDifficulty };
     actions.startSession(selectedTimer, selectedDifficulty);
-    resetSessionData({}); 
-    srSystem.resetWordStats();
+    resetSessionData({});
   }, [selectedTimer, selectedDifficulty, actions, resetSessionData, srSystem]);
 
   useEffect(() => {
