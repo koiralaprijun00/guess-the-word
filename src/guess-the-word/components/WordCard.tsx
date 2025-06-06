@@ -12,16 +12,34 @@ import { LoadingWordCard } from './LoadingWordCard';
 const WordDisplayContent: React.FC<{ word: string; timeLeft: number }> = ({ word, timeLeft }) => {
   const urgencyLevel = timeLeft <= 3 ? 'urgent' : timeLeft <= 7 ? 'warning' : 'normal';
   return (
-    <div className="relative z-10 text-center space-y-6 flex-1 flex flex-col justify-center">
-      <div className="absolute inset-0 opacity-5">
-        <div className="absolute top-0 left-0 w-32 h-32 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full animate-float"></div>
-        <div className="absolute bottom-0 right-0 w-24 h-24 bg-gradient-to-br from-pink-400 to-red-500 rounded-full animate-float-delayed"></div>
+    <div
+      style={{
+        position: 'relative',
+        zIndex: 10,
+        textAlign: 'center',
+        flex: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        gap: '1.5rem',
+      }}
+    >
+      <div style={{ position: 'absolute', inset: 0, opacity: 0.05 }}>
+        <div style={{ position: 'absolute', top: 0, left: 0, width: 128, height: 128, background: 'linear-gradient(to bottom right, #60a5fa, #a21caf)', borderRadius: '50%' }}></div>
+        <div style={{ position: 'absolute', bottom: 0, right: 0, width: 96, height: 96, background: 'linear-gradient(to bottom right, #f472b6, #ef4444)', borderRadius: '50%' }}></div>
       </div>
-      <div className={cn(
-        "text-6xl md:text-7xl font-bold text-foreground transition-all duration-300 font-devanagari",
-        "hover:scale-105 cursor-default select-none",
-        urgencyLevel === 'urgent' && "text-red-600"
-      )}>
+      <div
+        className={"font-devanagari"}
+        style={{
+          fontSize: '3.75rem', // text-6xl
+          fontWeight: 700,
+          color: urgencyLevel === 'urgent' ? '#dc2626' : 'var(--foreground)',
+          transition: 'all 0.3s',
+          lineHeight: 1.1,
+          cursor: 'default',
+          userSelect: 'none',
+        }}
+      >
         {word}
       </div>
     </div>
@@ -34,14 +52,19 @@ const WordTimerContent: React.FC<{ timeLeft: number; timerDuration: number; mean
   const urgencyLevel = timeLeft <= 3 ? 'urgent' : timeLeft <= 7 ? 'warning' : 'normal';
   if (meaningsVisible) return null;
   return (
-    <div className="space-y-4 -mx-4 px-4">
-      <div className="relative">
-        <Progress value={timerProgress} className={cn("w-full h-3 transition-all duration-300")} />
-        <div className={cn("absolute inset-0 rounded-full", urgencyLevel === 'urgent' && "bg-red-500/20")}></div>
+    <div style={{ marginLeft: -16, marginRight: -16, paddingLeft: 16, paddingRight: 16, display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+      <div style={{ position: 'relative' }}>
+        <Progress value={timerProgress} style={{ width: '100%', height: 12, transition: 'all 0.3s' }} />
+        <div style={{
+          position: 'absolute',
+          inset: 0,
+          borderRadius: 9999,
+          background: urgencyLevel === 'urgent' ? 'rgba(239, 68, 68, 0.2)' : undefined,
+        }}></div>
       </div>
-      <div className="flex items-center justify-center space-x-2">
-        <Clock className={cn("w-4 h-4 transition-colors", urgencyLevel === 'urgent' ? "text-red-500" : urgencyLevel === 'warning' ? "text-orange-500" : "text-muted-foreground")} />
-        <span className={cn("text-lg font-mono font-semibold transition-colors", urgencyLevel === 'urgent' ? "text-red-500" : urgencyLevel === 'warning' ? "text-orange-500" : "text-muted-foreground")}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+        <Clock style={{ width: 16, height: 16, color: urgencyLevel === 'urgent' ? '#ef4444' : urgencyLevel === 'warning' ? '#f59e42' : 'var(--muted-foreground)', transition: 'color 0.3s' }} />
+        <span style={{ fontSize: '1.125rem', fontFamily: 'monospace', fontWeight: 600, color: urgencyLevel === 'urgent' ? '#ef4444' : urgencyLevel === 'warning' ? '#f59e42' : 'var(--muted-foreground)', transition: 'color 0.3s' }}>
           {timeLeft}s
         </span>
       </div>
@@ -52,18 +75,26 @@ const WordTimerContent: React.FC<{ timeLeft: number; timerDuration: number; mean
 // --- Re-integrating WordMeaning logic ---
 const WordMeaningContent: React.FC<{ wordData: { roman: string; meaning_nepali: string; meaning_english: string } }> = ({ wordData }) => {
   return (
-    <div className="space-y-6 text-center">
-      <div className="text-2xl md:text-3xl font-semibold text-muted-foreground font-english">
-        {wordData.roman}
-      </div>
-      <div className="space-y-4">
-        <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 rounded-lg border border-blue-200 dark:border-blue-800">
-          <div className="text-sm font-medium text-blue-600 dark:text-blue-400 mb-2">नेपाली अर्थ</div>
-          <div className="text-lg text-foreground font-devanagari leading-relaxed">{wordData.meaning_nepali}</div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', textAlign: 'center' }}>
+      <div className="font-english" style={{ fontSize: '1.5rem', fontWeight: 600, color: 'var(--muted-foreground)' }}>{wordData.roman}</div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <div style={{
+          padding: 16,
+          background: 'linear-gradient(to right, #eff6ff, #eef2ff)',
+          borderRadius: 12,
+          border: '1px solid #bfdbfe',
+        }}>
+          <div style={{ fontSize: '0.875rem', fontWeight: 500, color: '#2563eb', marginBottom: 8 }}>नेपाली अर्थ</div>
+          <div className="font-devanagari" style={{ fontSize: '1.125rem', color: 'var(--foreground)', lineHeight: 1.6 }}>{wordData.meaning_nepali}</div>
         </div>
-        <div className="p-4 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 rounded-lg border border-green-200 dark:border-green-800">
-          <div className="text-sm font-medium text-green-600 dark:text-green-400 mb-2">English Meaning</div>
-          <div className="text-lg text-foreground font-english leading-relaxed">{wordData.meaning_english}</div>
+        <div style={{
+          padding: 16,
+          background: 'linear-gradient(to right, #f0fdf4, #ecfdf5)',
+          borderRadius: 12,
+          border: '1px solid #bbf7d0',
+        }}>
+          <div style={{ fontSize: '0.875rem', fontWeight: 500, color: '#16a34a', marginBottom: 8 }}>English Meaning</div>
+          <div className="font-english" style={{ fontSize: '1.125rem', color: 'var(--foreground)', lineHeight: 1.6 }}>{wordData.meaning_english}</div>
         </div>
       </div>
     </div>
@@ -95,30 +126,82 @@ export const WordCard: React.FC = () => {
   const urgencyLevel = timeLeft <= 3 ? 'urgent' : timeLeft <= 7 ? 'warning' : 'normal';
 
   return (
-    <div className="relative w-full perspective-1000 space-y-4" style={{ perspective: '1000px' }}>
-      <div 
-        className={cn(
-          "relative w-full h-96 transition-transform duration-700 transform-style-preserve-3d",
-          cardFlipped && "rotate-y-180"
-        )}
-        style={{ transformStyle: 'preserve-3d' }}
+    <div
+      style={{
+        position: 'relative',
+        width: '100%',
+        perspective: '1000px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '1rem',
+      }}
+    >
+      <div
+        style={{
+          position: 'relative',
+          width: '100%',
+          height: 384, // h-96
+          transition: 'transform 0.7s',
+          transformStyle: 'preserve-3d',
+          transform: cardFlipped ? 'rotateY(180deg)' : undefined,
+        }}
       >
         {/* Front of card - Word */}
-        <Card className={cn(
-          "absolute inset-0 shadow-2xl backface-hidden bg-gradient-to-br from-gradient-yellow via-gradient-orange to-gradient-magenta p-1 transition-all duration-300",
-          urgencyLevel === 'urgent' && "shadow-red-500/50"
-        )}>
-          <CardContent className="bg-card p-8 rounded-md h-full flex flex-col items-center justify-center relative overflow-hidden">
+        <Card
+          style={{
+            position: 'absolute',
+            inset: 0,
+            boxShadow: urgencyLevel === 'urgent' ? '0 25px 50px -12px rgba(239,68,68,0.5)' : '0 25px 50px -12px rgba(0,0,0,0.25)',
+            background: 'linear-gradient(to bottom right, #FFD700, #FFA500, #FF00FF)',
+            padding: 4,
+            transition: 'all 0.3s',
+            backfaceVisibility: 'hidden',
+          }}
+        >
+          <CardContent
+            style={{
+              background: 'hsl(var(--card))',
+              padding: 32,
+              borderRadius: 6,
+              height: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              position: 'relative',
+              overflow: 'hidden',
+            }}
+          >
             <WordDisplayContent word={currentWord.nepali} timeLeft={timeLeft} />
             <WordTimerContent timeLeft={timeLeft} timerDuration={timerDuration} meaningsVisible={meaningsVisible} />
           </CardContent>
         </Card>
 
         {/* Back of card - Meanings */}
-        <Card className={cn(
-          "absolute inset-0 shadow-2xl rotate-y-180 backface-hidden bg-gradient-to-br from-gradient-magenta via-gradient-orange to-gradient-yellow p-1"
-        )}>
-          <CardContent className="bg-card p-8 rounded-md h-full flex flex-col justify-center relative overflow-hidden">
+        <Card
+          style={{
+            position: 'absolute',
+            inset: 0,
+            boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)',
+            background: 'linear-gradient(to bottom right, #FF00FF, #FFA500, #FFD700)',
+            padding: 4,
+            backfaceVisibility: 'hidden',
+            transform: 'rotateY(180deg)',
+          }}
+        >
+          <CardContent
+            style={{
+              background: 'hsl(var(--card))',
+              padding: 32,
+              borderRadius: 6,
+              height: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              position: 'relative',
+              overflow: 'hidden',
+            }}
+          >
             <WordMeaningContent wordData={{
               roman: currentWord.roman,
               meaning_nepali: currentWord.meaning_nepali,

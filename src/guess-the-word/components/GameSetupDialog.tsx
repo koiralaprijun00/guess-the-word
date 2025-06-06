@@ -55,26 +55,67 @@ export const GameSetupDialog: React.FC = () => { // Renamed component
       onOpenChange={() => {}} // Prevents closing via X or overlay click
     >
       <DialogContentNoClose 
-        className="sm:max-w-md bg-gradient-to-br from-blue-500 via-purple-500 to-pink-400 rounded-2xl shadow-2xl p-2 border-0"
+        style={{
+          maxWidth: 500,
+          background: 'linear-gradient(to bottom right, #3b82f6, #a21caf, #f472b6)',
+          borderRadius: 16,
+          boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)',
+          padding: 8,
+          border: 0,
+        }}
         aria-describedby="game-setup-description"
       >
-        <div className="bg-white rounded-md p-8 border border-gray-200">
+        <div style={{
+          background: '#fff',
+          borderRadius: 6,
+          padding: 32,
+          borderWidth: 1,
+          borderStyle: 'solid',
+          borderColor: '#e5e7eb',
+        }}>
           <DialogHeader>
-            <DialogTitle className="text-2xl font-bold text-gray-900 mb-2">
+            <DialogTitle style={{
+              fontSize: '1.5rem',
+              lineHeight: '2rem',
+              fontWeight: 700,
+              color: '#111827',
+              marginBottom: '0.5rem',
+            }}>
               Jhole Nepali Shabda
             </DialogTitle>
           </DialogHeader>
-          <div className="mb-6 text-left text-base text-gray-700 leading-relaxed">
+          <div style={{
+            marginBottom: '1.5rem',
+            textAlign: 'left',
+            fontSize: '1rem',
+            lineHeight: 1.625,
+            color: '#374151',
+          }}>
             <p>
               यो खेलमा रमाइलो गर्दै नेपाली शब्दहरू सिकौं।<br />
               हरेक शब्दको अर्थ बुझ्न प्रयास गरौं, साथीहरूलाई जितौं।<br />
             </p>
-            <p className="mt-3 text-sm text-gray-500">
+            <p style={{
+              marginTop: '0.75rem',
+              fontSize: '0.875rem',
+              lineHeight: '1.25rem',
+              color: '#6b7280',
+            }}>
               Let's have fun and learn Nepali words together!<br />
               Try to guess the meaning of each word and beat your friends.<br />
             </p>
           </div>
-          <DialogDescription id="game-setup-description" className="sr-only">
+          <DialogDescription id="game-setup-description" style={{
+            position: 'absolute',
+            width: 1,
+            height: 1,
+            padding: 0,
+            margin: -1,
+            overflow: 'hidden',
+            clip: 'rect(0,0,0,0)',
+            whiteSpace: 'nowrap',
+            borderWidth: 0,
+          }}>
             Game setup modal to select difficulty and timer duration before starting a learning session.
           </DialogDescription>
           <TimerSelector 

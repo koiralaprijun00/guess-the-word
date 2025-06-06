@@ -114,16 +114,17 @@
 
 @layer base {
   * {
-    @apply border-border;
+    border-color: hsl(var(--border));
   }
   body {
-    @apply bg-background text-foreground;
+    background: hsl(var(--background));
+    color: hsl(var(--foreground));
     /* Default font is Geist Sans (from layout), Devanagari specific fonts applied via class */
     font-feature-settings: "rlig" 1, "calt" 1; /* Common OpenType features */
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-english;
+    font-family: var(--font-geist-sans), sans-serif;
   }
 }
 
