@@ -49,15 +49,6 @@ export default function TimerSelector({
   return (
     <div className="max-h-[50vh] overflow-y-auto">
       <div className="space-y-6">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">
-            Choose Settings
-          </h2>
-          <p className="text-sm text-gray-600">
-            Select game mode and time per word
-          </p>
-        </div>
-
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
@@ -117,7 +108,7 @@ export default function TimerSelector({
         <div className="mt-8 pt-6 border-t border-gray-200">
           <Button 
             onClick={handleStartGame} 
-            className="w-full bg-green-500 hover:bg-green-600 text-white py-3 text-lg font-semibold flex items-center justify-center gap-2"
+            className="w-full bg-gradient-to-br from-blue-500 via-purple-500 to-pink-400 hover:brightness-110 text-white py-3 text-lg font-semibold flex items-center justify-center gap-2 shadow-md border-0"
             aria-label="Start Learning Session"
           >
             <Play className="h-5 w-5" />
